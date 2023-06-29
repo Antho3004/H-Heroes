@@ -19,7 +19,11 @@ class Profil(commands.Cog):
         if result is not None:
             description = result[1]
             argent = result[2]
-            nombre_de_cartes = result[3]
+
+            # Compter le nombre de cartes
+            cursor.execute("SELECT COUNT(*) FROM user_inventaire WHERE user_id = ?", (str(user.id),))
+            nombre_de_cartes = cursor.fetchone()[0]
+
             carte_favori = result[4]
         else:
             description = "Bienvenue sur mon profil !"
