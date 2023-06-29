@@ -32,9 +32,10 @@ class Profil(commands.Cog):
             carte_favori = ""
 
         embed = discord.Embed(title=f"Profil de {user.name}", description=description, color=discord.Color.blue())
-        embed.add_field(name="Argent", value=str(argent), inline=False)
-        embed.add_field(name="Nombre de cartes", value=str(nombre_de_cartes), inline=False)
-        embed.add_field(name="Carte favorite", value=carte_favori, inline=False)
+        embed.add_field(name="", value=f":moneybag: **Argent** : {argent}", inline=False)
+        embed.add_field(name="", value=f":flower_playing_cards: **Nombre de cartes** : {nombre_de_cartes}", inline=False)
+        embed.add_field(name="", value=f":heart: **Carte favorite** : {carte_favori}", inline=False)
+
 
         await ctx.send(embed=embed)
 

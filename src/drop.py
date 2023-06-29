@@ -60,9 +60,9 @@ class Drop(commands.Cog):
         else:
             # Si la carte n'existe pas, l'ajouter à l'inventaire avec user_id à None
             cursor.execute(
-                "INSERT INTO user_inventaire (code_card, user_id, groupe, nom, rarete, version, chant, dance, rap, acting, modeling) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (code_card, user_id, groupe, card_name, rarete, version, chant, dance, rap, acting, modeling)
+                "INSERT INTO user_inventaire (code_card, user_id, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (code_card, user_id, groupe, card_name, rarete, version, chant, dance, rap, acting, modeling, url_image)
             )
             connection.commit()
 

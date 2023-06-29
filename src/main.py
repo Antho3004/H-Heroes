@@ -13,6 +13,7 @@ class Bot(commands.Bot):
         await self.load_extension("work")
         await self.load_extension("inventaire")
         await self.load_extension("drop")
+        await self.load_extension("view")
         await self.tree.sync()
         database.table_users()
 

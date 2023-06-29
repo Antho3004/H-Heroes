@@ -26,12 +26,13 @@ class Inventaire(commands.Cog):
                 nom = row[1]
                 groupe = row[2]
                 rarete = row[3]
-                embed.add_field(name=f"{code_card}", value=f"Nom : {nom}\nGroupe : {groupe}\nRareté : {rarete}", inline=False)
+                embed.add_field(name=f"{code_card}", value=f"Nom : {nom}\nGroupe : {groupe}\nRareté : <:C_:1107771999490686987>", inline=False) #changer le code par la rarete adéquate si C = <:C_:1107771999490686987>, U = ...
 
             embed.set_footer(text=f"Nombre total de cartes : {count}")
             await ctx.send(embed=embed)
         else:
-            await ctx.send("Votre inventaire est vide.")
+            embed = discord.Embed(title=f"Inventaire de {user.name}", description="Votre inventaire est vide.", color=discord.Color.red())
+            await ctx.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Inventaire(bot))

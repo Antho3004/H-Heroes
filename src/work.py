@@ -26,7 +26,8 @@ class Work(commands.Cog):
 
         connection.commit()
 
-        await ctx.send(f"**Tu as gagné {montant} d'argent !**")
+        embed = discord.Embed(title=f"Work de {user.name}", description=f"Tu as gagné {montant} d'argents !", color=discord.Color.green())
+        await ctx.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Work(bot))
