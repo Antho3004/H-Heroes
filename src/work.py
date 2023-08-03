@@ -12,23 +12,39 @@ class Work(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @commands.cooldown(1, 1800, commands.BucketType.user)
+    #@commands.cooldown(1, 1800, commands.BucketType.user)
     async def work(self, ctx):
         user = ctx.author
 
-        cursor.execute("SELECT * FROM user_data WHERE user_id = ?", (str(user.id),))
+        cursor.execute("SELECT i.rarete FROM user_data AS u JOIN user_inventaire AS i ON u.carte_favori = i.code_card WHERE u.user_id = ?", (str(user.id),))
         result = cursor.fetchone()
 
-        montant = random.randint(10, 200)
-
         if result is not None:
+            carte_rarete = result[0]
+            if carte_rarete == "C":
+                montant = random.randint(10, 100)
+            elif carte_rarete == "U":
+                montant = random.randint(100, 200)
+            elif carte_rarete == "R":
+                montant = random.randint(200, 300)
+            elif carte_rarete == "E":
+                montant = random.randint(300, 400)
+            elif carte_rarete == "L":
+                montant = random.randint(400, 500)
+            else:
+                embed = discord.Embed(title="**WORK**", description="You must choose a favourite card using the command `$fav or $favorite`", color=discord.Color.red())
+                await ctx.send(embed=embed)
+                return
+
             cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (montant, str(user.id)))
         else:
-            cursor.execute("INSERT INTO user_data VALUES (?, ?, ?, ?, ?)", (str(user.id), "", montant, 0, ""))
+            embed = discord.Embed(title="**WORK**", description="You don't have a favorite card. Please choose one using the command `$fav or $favorite`", color=discord.Color.red())
+            await ctx.send(embed=embed)
+            return
 
         connection.commit()
 
-        embed = discord.Embed(title=f"**WORK**", description=f"You have earned {montant} <:HCoins:1134169003657547847> from your last job!", color=discord.Color.green())
+        embed = discord.Embed(title=f"**WORK**", description=f"You have earned **{montant}** <:HCoins:1134169003657547847> from your last job!", color=discord.Color.green())
         await ctx.send(embed=embed)
     
     @commands.Cog.listener()

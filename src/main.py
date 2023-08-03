@@ -9,6 +9,7 @@ class Bot(commands.Bot):
         super().__init__(command_prefix="$", intents=discord.Intents.all())
 
     async def setup_hook(self) -> None:
+        await self.load_extension("start")
         await self.load_extension("profil")
         await self.load_extension("balance")
         await self.load_extension("work")

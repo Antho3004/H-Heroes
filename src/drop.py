@@ -11,7 +11,7 @@ class Drop(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @commands.cooldown(1, 600, commands.BucketType.user)
+    #@commands.cooldown(1, 600, commands.BucketType.user)
     async def drop(self, ctx):
         user_id = ctx.author.id
 

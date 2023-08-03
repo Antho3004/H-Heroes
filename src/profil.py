@@ -53,15 +53,8 @@ class Profil(commands.Cog):
                 carte_favori = "None"
 
         else:
-            description = "Welcome on my profile!"
-            argent = 0
-            formatted_argent = self.format_money(argent)
-            nombre_de_cartes = 0
-            carte_favori = "None"
-            packs_bronze = 0
-            packs_silver = 0
-            packs_gold = 0
-            packs_legendaire = 0
+            embed = discord.Embed(title="**Profile Not Found**", description="You don't have an account, use `$start` to create one.", color=discord.Color.red())
+            await ctx.send(embed=embed)
 
         embed = discord.Embed(title=f"{user.name}'s profile", description=description, color=discord.Color.blue())
         embed.add_field(name="", value=f":moneybag: **Wallet** : {formatted_argent} <:HCoins:1134169003657547847>", inline=False)
