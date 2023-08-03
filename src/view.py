@@ -18,30 +18,34 @@ class View(commands.Cog):
         card_data = cursor.fetchone()
         
         if not card_data:
-            await ctx.send("Vous ne possédez pas cette carte.")
+            embed = discord.Embed(title="", color=discord.Color.red())
+            embed.add_field(name="Vous ne possédez pas cette carte.", value="")
+            await ctx.send(embed=embed)
             return
 
         # Extraire les informations de la carte
-        card_code, nom, groupe, version, chant, dance, rap, acting, modeling = card_data
+        user_id, card_code, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url, event = card_data
 
         # Créer l'embed pour afficher les détails de la carte
         embed = discord.Embed(title="Détails de la carte", color=discord.Color.blue())
-        embed.add_field(name="Code", value=card_code, inline=True)
-        embed.add_field(name="Nom", value=nom, inline=True)
-        embed.add_field(name="Groupe", value=groupe, inline=True)
-        embed.add_field(name="Version", value=version, inline=True)
-        embed.add_field(name="Chant", value=chant, inline=True)
-        embed.add_field(name="Danse", value=dance, inline=True)
-        embed.add_field(name="Rap", value=rap, inline=True)
-        embed.add_field(name="Acting", value=acting, inline=True)
-        embed.add_field(name="Modeling", value=modeling, inline=True)
+        embed.add_field(name="", value=f"**Code** : {card_code}", inline=False)
+        embed.add_field(name="", value=f"**Nom** : {nom}", inline=False)
+        embed.add_field(name="", value=f"**Groupe** : {groupe}", inline=False)
+        embed.add_field(name="", value=f"**Version** : {version}", inline=False)
+        embed.add_field(name="", value=f":musical_note: **Chant** : {chant}", inline=False)
+        embed.add_field(name="", value=f":dancer: **Dance** : {dance}", inline=False)
+        embed.add_field(name="", value=f":microphone: **Rap** : {rap}", inline=False)
+        embed.add_field(name="", value=f":projector: **Acting** : {acting}", inline=False)
+        embed.add_field(name="", value=f":kimono: **Modeling** : {modeling}", inline=False)
+
+        # Vérifier si l'événement existe et l'ajouter à l'embed si c'est le cas
+        if event:
+            embed.add_field(name="Event", value=event, inline=False)
+        
+        # Ajouter l'image à l'embed
+        embed.set_image(url=image_url)
 
         await ctx.send(embed=embed)
-
-    @commands.command()
-    async def card(self, ctx, code_card: str):
-        await self.view(ctx, code_card)  # Appeler la méthode 'view' pour afficher les détails de la carte
-
 
 async def setup(bot):
     await bot.add_cog(View(bot))

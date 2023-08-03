@@ -10,10 +10,16 @@ class Bot(commands.Bot):
 
     async def setup_hook(self) -> None:
         await self.load_extension("profil")
+        await self.load_extension("balance")
         await self.load_extension("work")
         await self.load_extension("inventaire")
         await self.load_extension("drop")
         await self.load_extension("view")
+        await self.load_extension("favorite")
+        await self.load_extension("market")
+        await self.load_extension("shop")
+        await self.load_extension("daily")
+        #await self.load_extension("cooldown")
         await self.tree.sync()
         database.table_users()
 
