@@ -12,7 +12,7 @@ class Work(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    #@commands.cooldown(1, 1800, commands.BucketType.user)
+    @commands.cooldown(1, 1800, commands.BucketType.user)
     async def work(self, ctx):
         user = ctx.author
 

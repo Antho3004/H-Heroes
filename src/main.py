@@ -18,6 +18,7 @@ class Bot(commands.Bot):
         await self.load_extension("view")
         await self.load_extension("favorite")
         await self.load_extension("market")
+        await self.load_extension("trade")
         await self.load_extension("shop")
         await self.load_extension("daily")
         #await self.load_extension("cooldown")
