@@ -9,6 +9,9 @@ class Balance(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    def format_balance(self, balance):
+        return "{:,}".format(balance).replace(",", " ")  # Using format method and then replacing commas with spaces
+
     @commands.command()
     async def bal(self, ctx, user: discord.Member = None):
         if user is None:
@@ -23,7 +26,9 @@ class Balance(commands.Cog):
 
         money = result[0]
 
-        embed = discord.Embed(title=f"{user.name}", description=f"{ctx.author.mention} has **{money}** <:HCoins:1134169003657547847>")
+        formatted_balance = self.format_balance(money)
+
+        embed = discord.Embed(title=f"{user.name}", description=f"{ctx.author.mention} has **{formatted_balance}** <:HCoins:1134169003657547847>")
         await ctx.send(embed=embed)
 
 async def setup(bot):

@@ -9,8 +9,7 @@ class Favorite(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def favorite(self, ctx, code_card: str):
+    async def update_favorite_card(self, ctx, code_card):
         user = ctx.author
 
         cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND code_card = ?", (user.id, code_card))
@@ -23,7 +22,7 @@ class Favorite(commands.Cog):
 
             embed = discord.Embed(
                 title="Carte favorite mise à jour",
-                description=f"La carte **{code_card}** a été ajoutée comme carte favorite.",
+                description=f"The **{code_card}** card has been added as a favourite card.",
                 color=discord.Color.green()
             )
             await ctx.send(embed=embed)
@@ -31,10 +30,19 @@ class Favorite(commands.Cog):
             # Card not found in user's inventory
             embed = discord.Embed(
                 title="Erreur",
-                description="Vous ne possédez pas cette carte.",
+                description="You don't have this card.",
                 color=discord.Color.red()
             )
             await ctx.send(embed=embed)
 
+    @commands.command()
+    async def favorite(self, ctx, code_card: str):
+        await self.update_favorite_card(ctx, code_card)
+
+    @commands.command(name='fav')
+    async def shortcut_favorite(self, ctx, code_card: str):
+        await self.update_favorite_card(ctx, code_card)
+
 async def setup(bot):
     await bot.add_cog(Favorite(bot))
+

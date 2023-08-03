@@ -25,7 +25,7 @@ class Shop(commands.Cog):
 
         pack_name_lower = pack_name.lower()
         if pack_name_lower not in packs:
-            embed = discord.Embed(title="**SHOP**", description="This pack does not exist. Available packs: bronze, silver, gold, legendary.", color=discord.Color.red())
+            embed = discord.Embed(title="**SHOP**", description="This pack does not exist. Available packs: **bronze**/**silver**/**gold**/**legendary**", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 

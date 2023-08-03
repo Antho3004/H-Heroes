@@ -10,11 +10,7 @@ class Inventaire(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def inventaire(self, ctx, user: discord.Member = None, page: int = 1):
-        if user is None:
-            user = ctx.author
-
+    async def show_inventory(self, ctx, user, page):
         cursor.execute("SELECT COUNT(*) FROM user_inventaire WHERE user_id = ?", (str(user.id),))
         count = cursor.fetchone()[0]
 
@@ -91,6 +87,20 @@ class Inventaire(commands.Cog):
         else:
             embed = discord.Embed(title=f"{user.name}'s inventory", description="Your inventaire is empty.", color=discord.Color.red())
             await ctx.send(embed=embed)
+
+    @commands.command()
+    async def inventory(self, ctx, user: discord.Member = None, page: int = 1):
+        if user is None:
+            user = ctx.author
+
+        await self.show_inventory(ctx, user, page)
+
+    @commands.command(name='inv')
+    async def shortcut_inventory(self, ctx, user: discord.Member = None, page: int = 1):
+        if user is None:
+            user = ctx.author
+
+        await self.show_inventory(ctx, user, page)
 
 async def setup(bot):
     await bot.add_cog(Inventaire(bot))
