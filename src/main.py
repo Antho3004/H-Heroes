@@ -21,7 +21,7 @@ class Bot(commands.Bot):
         await self.load_extension("trade")
         await self.load_extension("shop")
         await self.load_extension("daily")
-        #await self.load_extension("cooldown")
+        await self.load_extension("cooldown")
         await self.tree.sync()
         database.table_users()
 
