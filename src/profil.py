@@ -10,7 +10,7 @@ class Profil(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def profil(self, ctx, user: discord.Member = None):
+    async def profile(self, ctx, user: discord.Member = None):
         if user is None:
             user = ctx.author
 
@@ -26,20 +26,20 @@ class Profil(commands.Cog):
             nombre_de_cartes = cursor.fetchone()[0]
 
             # Compter le nombre de packs bronze
-            cursor.execute("SELECT packs_bronze FROM user_data WHERE user_id = ?", (str(user.id),))
+            cursor.execute("SELECT bronze FROM user_data WHERE user_id = ?", (str(user.id),))
             packs_bronze = cursor.fetchone()[0] if cursor.fetchone()[0] is not None else 0
 
             # Compter le nombre de packs silver
-            cursor.execute("SELECT packs_silver FROM user_data WHERE user_id = ?", (str(user.id),))
+            cursor.execute("SELECT silver FROM user_data WHERE user_id = ?", (str(user.id),))
             packs_silver = cursor.fetchone()[0] if cursor.fetchone()[0] is not None else 0
 
             # Compter le nombre de packs gold
-            cursor.execute("SELECT packs_gold FROM user_data WHERE user_id = ?", (str(user.id),))
+            cursor.execute("SELECT gold FROM user_data WHERE user_id = ?", (str(user.id),))
             packs_gold = cursor.fetchone()[0] if cursor.fetchone()[0] is not None else 0
 
             # Compter le nombre de packs legendaire
-            cursor.execute("SELECT packs_legendaire FROM user_data WHERE user_id = ?", (str(user.id),))
-            packs_legendaire = cursor.fetchone()[0] if cursor.fetchone()[0] is not None else 0
+            cursor.execute("SELECT legendary FROM user_data WHERE user_id = ?", (str(user.id),))
+            packs_legendary = cursor.fetchone()[0] if cursor.fetchone()[0] is not None else 0
 
             carte_favori = result[4]
         else:
@@ -50,13 +50,13 @@ class Profil(commands.Cog):
             packs_bronze = 0
             packs_silver = 0
             packs_gold = 0
-            packs_legendaire = 0
+            packs_legendary = 0
 
         embed = discord.Embed(title=f"{user.name}'s profile", description=description, color=discord.Color.blue())
         embed.add_field(name="", value=f":moneybag: **Wallet** : {argent}", inline=False)
         embed.add_field(name="", value=f":flower_playing_cards: **Inventory** : {nombre_de_cartes}", inline=False)
         embed.add_field(name="", value=f":heart: **Favorite card** : {carte_favori}\n\n", inline=False)
-        embed.add_field(name="PACKS", value=f"<:Bronze:1136312536665440387> **Bronze** : {packs_bronze}\n<:Argent:1136312524900401213>  **Silver** : {packs_silver}\n<:Gold:1136312506957189131> **Gold** : {packs_gold}\n<:Legendary:1136312609449193544> ** Legendary** : {packs_legendaire}", inline=False)
+        embed.add_field(name="PACKS", value=f"<:Bronze:1136312536665440387> **Bronze** : {packs_bronze}\n<:Argent:1136312524900401213>  **Silver** : {packs_silver}\n<:Gold:1136312506957189131> **Gold** : {packs_gold}\n<:Legendary:1136312609449193544> ** Legendary** : {packs_legendary}", inline=False)
 
         await ctx.send(embed=embed)
 
