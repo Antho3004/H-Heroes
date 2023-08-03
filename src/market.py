@@ -14,8 +14,6 @@ class MarketPlace(commands.Cog):
         if user is None:
             user = ctx.author
 
-        # ... (Existing code to check if the marketplace is empty)
-
         cursor.execute("SELECT COUNT(*) FROM market")
         count = cursor.fetchone()[0]
 
@@ -172,31 +170,29 @@ class MarketPlace(commands.Cog):
                 user_balance = result2[0]
 
                 if user_balance >= card_price:
+                    code_card = str(code_card)
                     # Deduct the card price from the buyer's balance
                     cursor.execute("UPDATE user_data SET argent = argent - ? WHERE user_id = ?", (card_price, user.id))
-                    # Add the card to the buyer's inventory
-                    cursor.execute("INSERT INTO user_inventaire (user_id, code_card) VALUES (?, ?)", (user.id, code_card))
-                    # Remove the card from the market
-                    cursor.execute("DELETE FROM market WHERE code_card = ?", (code_card,))
                     # Add the card price to the seller's balance
                     cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (card_price, seller_id))
+                    # Add the card to the buyer's inventory
+                    cursor.execute("UPDATE user_inventaire SET user_id = ? where code_card = ?", (user.id, code_card))
+                    # Remove the card from the market
+                    cursor.execute("DELETE FROM market WHERE code_card = ?", (code_card,))
                     connection.commit()
 
                     embed = discord.Embed(
-                        description=f"You have purchased the **{code_card}** for **{card_price}** <:HCoins:1134169003657547847>",
-                        color=discord.Color.green()
+                        description=f"You have purchased the **{code_card}** for **{card_price}** <:HCoins:1134169003657547847>", color=discord.Color.green()
                     )
                     await ctx.send(embed=embed)
                 else:
-                    embed = discord.Embed(
-                        description="Sorry, you don't have enough <:HCoins:1134169003657547847> to buy this card.",
+                    embed = discord.Embed(description="Sorry, you don't have enough <:HCoins:1134169003657547847> to buy this card.",
                         color=discord.Color.red()
                     )
                     await ctx.send(embed=embed)
             else:
                 # The user doesn't have a balance entry, meaning they don't have any money
-                embed = discord.Embed(
-                    description="Sorry, you don't have enough <:HCoins:1134169003657547847> to buy this card.",
+                embed = discord.Embed(description="Sorry, you don't have enough <:HCoins:1134169003657547847> to buy this card.",
                     color=discord.Color.red()
                 )
                 await ctx.send(embed=embed)

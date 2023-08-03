@@ -12,11 +12,7 @@ class Profil(commands.Cog):
     def format_money(self, money):
         return "{:,}".format(money).replace(",", " ")
 
-    @commands.command()
-    async def profile(self, ctx, user: discord.Member = None):
-        if user is None:
-            user = ctx.author
-
+    async def show_profile(self, ctx, user):
         cursor.execute("SELECT * FROM user_data WHERE user_id = ?", (str(user.id),))
         result = cursor.fetchone()
 
@@ -63,6 +59,20 @@ class Profil(commands.Cog):
         embed.add_field(name="PACKS", value=f"<:Bronze:1136312536665440387> **Bronze** : {packs_bronze}\n<:Argent:1136312524900401213>  **Silver** : {packs_silver}\n<:Gold:1136312506957189131> **Gold** : {packs_gold}\n<:Legendary:1136312609449193544> **Legendary** : {packs_legendaire}", inline=False)
 
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def profile(self, ctx, user: discord.Member = None):
+        if user is None:
+            user = ctx.author
+
+        await self.show_profile(ctx, user)
+
+    @commands.command(name='pr')
+    async def shortcut_profile(self, ctx, user: discord.Member = None):
+        if user is None:
+            user = ctx.author
+
+        await self.show_profile(ctx, user)
 
     @commands.command()
     async def description(self, ctx, *, new_description):
