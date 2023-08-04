@@ -22,8 +22,8 @@ class Daily(commands.Cog):
             # Récompense de carte
             # Définir les pourcentages de drop en fonction de la rareté
             rarity_drop_rates = {
-                "C": 60,   # 30% pour les cartes communes (Common)
-                "U": 40,   # 25% pour les cartes peu communes (Uncommon)
+                "C": 50,   # 30% pour les cartes communes (Common)
+                "U": 50,   # 25% pour les cartes peu communes (Uncommon)
                 #"R": 20,   # 20% pour les cartes rares (Rare)
                 #"E": 15,   # 15% pour les cartes épiques (Epic)
                 #"L": 10    # 10% pour les cartes légendaires (Legendary)

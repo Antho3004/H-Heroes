@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import sqlite3
+import asyncio
 
 connection = sqlite3.connect("HallyuHeroes.db")
 cursor = connection.cursor()
@@ -30,70 +31,27 @@ class MarketPlace(commands.Cog):
 
             embed = discord.Embed(title=f"Marketplace", color=discord.Color.blue())
 
-                        # Group cards into lines of three
-            for i in range(start_idx, end_idx, 3):
-                row1 = result[i]
-                user_id1 = row1[0]
-                groupe1 = row1[1]
-                nom1 = row1[2]
-                rarete1 = row1[3]
-                code_card1 = row1[4]
-                prix1 = row1[5]
+            rarity_emojis = {
+                "C": "<:C_:1107771999490686987>",
+                "U": "<:U_:1107772008193867867>",
+                "R": "<:R_:1107772004410601553>",
+                "E": "<:E_:1107772001747222550>",
+                "L": "<:L_:1107772002690945055>"
+            }
 
-                rarity_emojis = {
-                    "C": "<:C_:1107771999490686987>",
-                    "U": "<:U_:1107772008193867867>",
-                    "R": "<:R_:1107772004410601553>",
-                    "E": "<:E_:1107772001747222550>",
-                    "L": "<:L_:1107772002690945055>"
-                }
+            for i in range(start_idx, end_idx):
+                row = result[i]
+                user_id = row[0]
+                groupe = row[1]
+                nom = row[2]
+                rarete = row[3]
+                code_card = row[4]
+                prix = row[5]
 
-                rarity_emoji1 = rarity_emojis.get(rarete1, "")  # Get the emoji for the corresponding rarity or an empty string if not found
+                rarity_emoji = rarity_emojis.get(rarete, "")
 
-                # Check if there is another card in this line
-                if i + 1 < end_idx:
-                    row2 = result[i + 1]
-                    user_id2 = row2[0]
-                    groupe2 = row2[1]
-                    nom2 = row2[2]
-                    rarete2 = row2[3]
-                    code_card2 = row2[4]
-                    prix2 = row2[5]
-                    rarity_emoji2 = rarity_emojis.get(rarete2, "")
-
-                    # Check if there is a third card in this line
-                    if i + 2 < end_idx:
-                        row3 = result[i + 2]
-                        user_id3 = row3[0]
-                        groupe3 = row3[1]
-                        nom3 = row3[2]
-                        rarete3 = row3[3]
-                        code_card3 = row3[4]
-                        prix3 = row3[5]
-                        rarity_emoji3 = rarity_emojis.get(rarete3, "")
-
-                        embed.add_field(name=f"**{groupe1}** **{nom1}** {rarity_emoji1}",
-                                        value=f"{code_card1}\nPrice : {prix1} <:HCoins:1134169003657547847>\n<@{user_id1}>",
-                                        inline=True)
-                        embed.add_field(name=f"**{groupe2}** **{nom2}** {rarity_emoji2}",
-                                        value=f"{code_card2}\nPrice : {prix2} <:HCoins:1134169003657547847>\n<@{user_id2}>",
-                                        inline=True)
-                        embed.add_field(name=f"**{groupe3}** **{nom3}** {rarity_emoji3}",
-                                        value=f"{code_card3}\nPrice : {prix3} <:HCoins:1134169003657547847>\n<@{user_id3}>",
-                                        inline=True)
-                    else:
-                        embed.add_field(name=f"**{groupe1}** **{nom1}** {rarity_emoji1}",
-                                        value=f"{code_card1}\nPrice : {prix1} <:HCoins:1134169003657547847>\n<@{user_id1}>",
-                                        inline=True)
-                        embed.add_field(name=f"**{groupe2}** **{nom2}** {rarity_emoji2}",
-                                        value=f"{code_card2}\nPrice : {prix2} <:HCoins:1134169003657547847>\n<@{user_id2}>",
-                                        inline=True)
-                else:
-                    embed.add_field(name=f"**{groupe1}** **{nom1}** {rarity_emoji1}",
-                                    value=f"{code_card1}\nPrice : {prix1} <:HCoins:1134169003657547847>\nSeller: <@{user_id1}>",
-                                    inline=False)
-
-            embed.set_footer(text=f"Page {page}/{total_pages} - {count} cards available")
+                embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {prix} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
+            embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
             msg = await ctx.send(embed=embed)
 
             if total_pages > 1:
@@ -105,21 +63,34 @@ class MarketPlace(commands.Cog):
 
                 while True:
                     try:
-                        reaction, _ = await self.bot.wait_for("reaction_add", timeout=30.0, check=check)
+                        reaction, _ = await self.bot.wait_for("reaction_add", timeout=180.0, check=check)
 
                         if str(reaction.emoji) == "➡️" and page < total_pages:
                             page += 1
                         elif str(reaction.emoji) == "⬅️" and page > 1:
                             page -= 1
+                        
+                        start_idx = (page - 1) * items_per_page
+                        end_idx = min(start_idx + items_per_page, count)
+                        embed.clear_fields()
+                        for i in range(start_idx, end_idx):
+                            row = result[i]
+                            user_id = row[0]
+                            groupe = row[1]
+                            nom = row[2]
+                            rarete = row[3]
+                            code_card = row[4]
+                            prix = row[5]
 
-                        await msg.delete()
-                        break
+                            rarity_emoji = rarity_emojis.get(rarete, "")
 
-                    except TimeoutError:
+                            embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {prix} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
+                        embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
+                        await msg.edit(embed=embed)
+
+                    except asyncio.TimeoutError:
                         await msg.clear_reactions()
                         break
-
-                await self.mp(ctx, user, page)
 
         else:
             embed = discord.Embed(title="Marketplace", description="Marketplace is empty.", color=discord.Color.red())
