@@ -30,7 +30,7 @@ class MarketPlace(commands.Cog):
 
             embed = discord.Embed(title=f"Marketplace", color=discord.Color.blue())
 
-            # Group cards into lines of three
+                        # Group cards into lines of three
             for i in range(start_idx, end_idx, 3):
                 row1 = result[i]
                 user_id1 = row1[0]
@@ -199,6 +199,34 @@ class MarketPlace(commands.Cog):
         else:
             embed = discord.Embed(
                 description="Sorry, this card is not available in this marketplace.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
+
+    @commands.command()
+    async def wd(self, ctx, code_card):
+        user = ctx.author
+
+        # Check if the user owns the card they want to withdraw from the market
+        cursor.execute("SELECT i.user_id FROM market m JOIN user_inventaire i ON m.code_card = i.code_card WHERE i.code_card = ?", (code_card,))
+        seller_id = cursor.fetchone()
+
+        if seller_id[0] != user.id:
+            # Remove the card from the market
+            code_card = str(code_card)
+            cursor.execute("DELETE FROM market WHERE code_card = ?", (code_card,))
+            connection.commit()
+
+            embed = discord.Embed(
+                title="MarketPlace",
+                description=f"`{code_card}` has been withdrawn from the market.",
+                color=discord.Color.green()
+            )
+            await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed(
+                title="MarketPlace",
+                description=f"You are not authorised to withdraw this card from the market because it does not belong to you.",
                 color=discord.Color.red()
             )
             await ctx.send(embed=embed)

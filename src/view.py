@@ -19,7 +19,7 @@ class View(commands.Cog):
         
         if not card_data:
             embed = discord.Embed(title="", color=discord.Color.red())
-            embed.add_field(name="Vous ne possédez pas cette carte.", value="")
+            embed.add_field(name="You don't have this card", value="")
             await ctx.send(embed=embed)
             return
 
@@ -27,20 +27,20 @@ class View(commands.Cog):
         user_id, card_code, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url, event = card_data
 
         # Créer l'embed pour afficher les détails de la carte
-        embed = discord.Embed(title="Détails de la carte", color=discord.Color.blue())
-        embed.add_field(name="", value=f"**Code** : {card_code}", inline=False)
-        embed.add_field(name="", value=f"**Nom** : {nom}", inline=False)
-        embed.add_field(name="", value=f"**Groupe** : {groupe}", inline=False)
+        embed = discord.Embed(title="CARD'S DETAILS", color=discord.Color.blue())
+        embed.add_field(name="", value=f"**CODE** : {card_code}", inline=False)
+        embed.add_field(name="", value=f"**NAME** : {nom}", inline=False)
+        embed.add_field(name="", value=f"**GROUP** : {groupe}", inline=False)
         embed.add_field(name="", value=f"**Version** : {version}", inline=False)
-        embed.add_field(name="", value=f":musical_note: **Chant** : {chant}", inline=False)
-        embed.add_field(name="", value=f":dancer: **Dance** : {dance}", inline=False)
-        embed.add_field(name="", value=f":microphone: **Rap** : {rap}", inline=False)
-        embed.add_field(name="", value=f":projector: **Acting** : {acting}", inline=False)
-        embed.add_field(name="", value=f":kimono: **Modeling** : {modeling}", inline=False)
+        embed.add_field(name="", value=f":musical_note: **SING** : {chant}", inline=False)
+        embed.add_field(name="", value=f":dancer: **DANCE** : {dance}", inline=False)
+        embed.add_field(name="", value=f":microphone: **RAP** : {rap}", inline=False)
+        embed.add_field(name="", value=f":projector: **ACTING** : {acting}", inline=False)
+        embed.add_field(name="", value=f":kimono: **MODELING** : {modeling}", inline=False)
 
         # Vérifier si l'événement existe et l'ajouter à l'embed si c'est le cas
         if event:
-            embed.add_field(name="Event", value=event, inline=False)
+            embed.add_field(name="", value=f"**EVENT** : {event}", inline=False)
         
         # Ajouter l'image à l'embed
         embed.set_image(url=image_url)
