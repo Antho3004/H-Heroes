@@ -27,16 +27,8 @@ class View(commands.Cog):
         user_id, card_code, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url, event = card_data
 
         # Créer l'embed pour afficher les détails de la carte
-        embed = discord.Embed(title="CARD'S DETAILS", color=discord.Color.blue())
-        embed.add_field(name="", value=f"**CODE** : {card_code}", inline=False)
-        embed.add_field(name="", value=f"**NAME** : {nom}", inline=False)
-        embed.add_field(name="", value=f"**GROUP** : {groupe}", inline=False)
-        embed.add_field(name="", value=f"**Version** : {version}", inline=False)
-        embed.add_field(name="", value=f":musical_note: **SING** : {chant}", inline=False)
-        embed.add_field(name="", value=f":dancer: **DANCE** : {dance}", inline=False)
-        embed.add_field(name="", value=f":microphone: **RAP** : {rap}", inline=False)
-        embed.add_field(name="", value=f":projector: **ACTING** : {acting}", inline=False)
-        embed.add_field(name="", value=f":kimono: **MODELING** : {modeling}", inline=False)
+        embed = discord.Embed(title="CARD'S DETAILS", description=f"**CODE** : {code_card}\n**NAME** : {nom}\n**GROUP** : {groupe}\n**VERSION** : {version}\n" ,color=discord.Color.blue())
+        embed.add_field(name="STATS", value=f":musical_note: **SING** : {chant}\n:dancer: **DANCE** : {dance}\n:microphone: **RAP** : {rap}\n:projector: **ACTING** : {acting}\n:kimono: **MODELING** : {modeling}", inline=True)
 
         # Vérifier si l'événement existe et l'ajouter à l'embed si c'est le cas
         if event:
