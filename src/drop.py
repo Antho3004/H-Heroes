@@ -11,7 +11,7 @@ class Drop(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @commands.cooldown(1, 600, commands.BucketType.user)
+    #@commands.cooldown(1, 600, commands.BucketType.user)
     async def drop(self, ctx):
         user_id = ctx.author.id
 
@@ -90,29 +90,29 @@ class Drop(commands.Cog):
         modeling = random.randint(0, 100)
 
         if rarity == "U":
-            chant += random.randint(100, 150)
-            dance += random.randint(100, 150)
-            rap += random.randint(100, 150)
-            acting += random.randint(100, 150)
-            modeling += random.randint(100, 150)
+            chant = random.randint(100, 150)
+            dance = random.randint(100, 150)
+            rap = random.randint(100, 150)
+            acting = random.randint(100, 150)
+            modeling = random.randint(100, 150)
         elif rarity == "R":
-            chant += random.randint(150, 200)
-            dance += random.randint(150, 200)
-            rap += random.randint(150, 200)
-            acting += random.randint(150, 200)
-            modeling += random.randint(150, 200)
+            chant = random.randint(150, 200)
+            dance = random.randint(150, 200)
+            rap = random.randint(150, 200)
+            acting = random.randint(150, 200)
+            modeling = random.randint(150, 200)
         elif rarity == "E":
-            chant += random.randint(200, 250)
-            dance += random.randint(200, 250)
-            rap += random.randint(200, 250)
-            acting += random.randint(200, 250)
-            modeling += random.randint(200, 250)
+            chant = random.randint(200, 250)
+            dance = random.randint(200, 250)
+            rap = random.randint(200, 250)
+            acting = random.randint(200, 250)
+            modeling = random.randint(200, 250)
         elif rarity == "L":
-            chant += random.randint(250, 300)
-            dance += random.randint(250, 300)
-            rap += random.randint(250, 300)
-            acting += random.randint(250, 300)
-            modeling += random.randint(250, 300)
+            chant = random.randint(250, 300)
+            dance = random.randint(250, 300)
+            rap = random.randint(250, 300)
+            acting = random.randint(250, 300)
+            modeling = random.randint(250, 300)
 
         # Vérifier si la carte existe déjà dans la table user_inventaire
         existing_card = cursor.execute("SELECT code_card FROM user_inventaire WHERE code_card = ?", (code_card,)).fetchone()

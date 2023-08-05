@@ -27,7 +27,7 @@ class View(commands.Cog):
         user_id, card_code, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url, event = card_data
 
         # Créer l'embed pour afficher les détails de la carte
-        embed = discord.Embed(title="CARD'S DETAILS", description=f"**CODE** : {code_card}\n**NAME** : {nom}\n**GROUP** : {groupe}\n**VERSION** : {version}\n" ,color=discord.Color.blue())
+        embed = discord.Embed(title="CARD'S DETAILS", description=f"**CODE** : {code_card}\n**NAME** : {nom}\n**GROUP** : {groupe}\n**VERSION** : {version}\n**OWNER** : <@{user_id}>\n" ,color=discord.Color.blue())
         embed.add_field(name="STATS", value=f":musical_note: **SING** : {chant}\n:dancer: **DANCE** : {dance}\n:microphone: **RAP** : {rap}\n:projector: **ACTING** : {acting}\n:kimono: **MODELING** : {modeling}", inline=True)
 
         # Vérifier si l'événement existe et l'ajouter à l'embed si c'est le cas
