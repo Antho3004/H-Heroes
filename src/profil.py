@@ -57,6 +57,7 @@ class Profil(commands.Cog):
         embed.add_field(name="", value=f":flower_playing_cards: **Inventory** : {nombre_de_cartes}", inline=False)
         embed.add_field(name="", value=f":heart: **Favorite card** : {carte_favori}\n\n", inline=False)
         embed.add_field(name="PACKS", value=f"<:Bronze:1136312536665440387> **Bronze** : {packs_bronze}\n<:Argent:1136312524900401213>  **Silver** : {packs_silver}\n<:Gold:1136312506957189131> **Gold** : {packs_gold}\n<:Legendary:1136312609449193544> **Legendary** : {packs_legendaire}", inline=False)
+        embed.add_field(name="ACHIEVEMENT", value=f"soon\n", inline=False)
 
         await ctx.send(embed=embed)
 
