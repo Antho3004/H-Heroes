@@ -45,7 +45,7 @@ class Daily(commands.Cog):
                     break
 
             if not rarity:
-                await ctx.send("Aucune carte n'est disponible.")
+                await ctx.send("La rareté n'est pas disponible.")
                 return
 
             # Requête pour obtenir une carte aléatoire de la rareté déterminée
@@ -138,7 +138,7 @@ class Daily(commands.Cog):
             rarity_emoji = rarity_emojis.get(rarity, "")  # Get the emoji for the corresponding rarity or an empty string if not found
 
             # Crée le titre de l'embed avec le nom de la carte, le groupe et la rareté
-            title = f"**DROP**"
+            title = f"**DAILY REWARD - DROP**"
 
             # Crée le message à envoyer après avoir dropé la carte
             drop_message = f"Congratulations {ctx.author.mention}\nYou have dropped: [{groupe} {card_name} - {rarity_emoji} ] n° {code_card.split('-')[1]}"
@@ -164,7 +164,7 @@ class Daily(commands.Cog):
             connection.commit()
 
             # Crée le titre de l'embed
-            title = f"**DAILY REWARD**"
+            title = f"**DAILY REWARD - WORK**"
 
             # Crée le message à envoyer après avoir gagné de l'argent
             drop_message = f"Congratulations {ctx.author.mention}\nYou have received a daily reward of {montant} <:HCoins:1134169003657547847>!"

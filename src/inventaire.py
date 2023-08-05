@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from typing import List
 import sqlite3
 import asyncio
 
@@ -44,7 +45,7 @@ class Inventaire(commands.Cog):
 
                 rarity_emoji = rarity_emojis.get(rarete, "")
 
-                embed.add_field(name=f"{code_card}", value=f"Name : {nom}\nGroup : {groupe}\nRareté : {rarity_emoji}\n", inline=True)
+                embed.add_field(name=f"{code_card}", value=f"Name : {nom}\nGroup : {groupe}\nRarity : {rarity_emoji}\n", inline=True)
 
             embed.set_footer(text=f"Page {page}/{total_pages} - You have {count} cards")
             msg = await ctx.send(embed=embed)
@@ -76,12 +77,14 @@ class Inventaire(commands.Cog):
                             groupe = row[2]
                             rarete = row[3]
                             rarity_emoji = rarity_emojis.get(rarete, "")
-                            embed.add_field(name=f"{code_card}", value=f"Name : {nom}\nGroup : {groupe}\nRareté : {rarity_emoji}\n", inline=True)
+                            embed.add_field(name=f"{code_card}", value=f"Name : {nom}\nGroup : {groupe}\nRarity : {rarity_emoji}\n", inline=True)
                         embed.set_footer(text=f"Page {page}/{total_pages} - You have {count} cards")
                         await msg.edit(embed=embed)
 
+                        # Reset reaction count to 1
+                        await reaction.remove(ctx.author)
+
                     except asyncio.TimeoutError:
-                        await msg.clear_reactions()
                         break
 
         else:

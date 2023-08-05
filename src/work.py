@@ -17,7 +17,7 @@ def has_favorite_card():
         if result is not None:
             return True
         else:
-            embed = discord.Embed(title="**WORK**", description="You don't have a favorite card. Please choose one using the command `$fav or $favorite`", color=discord.Color.red())
+            embed = discord.Embed(title=f"{user.name} - **WORK**", description="You don't have a favorite card. Please choose one using the command `$fav or $favorite`", color=discord.Color.red())
             await ctx.send(embed=embed)  # Await the send() function here
             return False
 
@@ -51,7 +51,7 @@ class Work(commands.Cog):
         cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (montant, str(user.id)))
         connection.commit()
 
-        embed = discord.Embed(title=f"**WORK**", description=f"You have earned **{montant}** <:HCoins:1134169003657547847> from your last job!", color=discord.Color.green())
+        embed = discord.Embed(title=f"{user.name} - **WORK**", description=f"You have earned **{montant}** <:HCoins:1134169003657547847> from your last job!", color=discord.Color.green())
         await ctx.send(embed=embed)
 
 async def setup(bot):

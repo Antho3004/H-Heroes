@@ -15,25 +15,33 @@ class Trade(commands.Cog):
             user = ctx.author
 
         if code_card is None:
-            embed = discord.Embed(description=f"Please provide a card code", color=discord.Color.red())
+            embed = discord.Embed(description="Please provide a card code", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
-        # Vérifier si l'utilisateur a la carte avant de la donner
         author_id = ctx.author.id
         cursor.execute("SELECT * FROM user_inventaire WHERE user_id = ? AND code_card = ?", (author_id, code_card))
         card_data = cursor.fetchone()
 
         if card_data is None:
-            embed = discord.Embed(description=f"You don't have this card", color=discord.Color.red())
+            embed = discord.Embed(description="You don't have this card", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
+
+        # Vérifier si la carte se trouve dans le marché
+        cursor.execute("SELECT * FROM market WHERE code_card = ?", (code_card,))
+        market_card_data = cursor.fetchone()
+
+        if market_card_data is not None:
+            # Retirer la carte du marché
+            cursor.execute("DELETE FROM market WHERE code_card = ?", (code_card,))
+            connection.commit()
 
         # Donner la carte à l'utilisateur mentionné
         cursor.execute("UPDATE user_inventaire SET user_id = ? where code_card = ?", (user.id, code_card))
         connection.commit()
 
-        embed = discord.Embed(description=f"You gave the card `{code_card}` to {user.mention} !", color=discord.Color.green())
+        embed = discord.Embed(description=f"You gave the card `{code_card}` to {user.mention}", color=discord.Color.green())
         await ctx.send(embed=embed)
     
     @commands.command()

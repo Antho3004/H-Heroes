@@ -39,7 +39,7 @@ class Drop(commands.Cog):
             drop_chance -= drop_rate
 
         if not rarity:
-            await ctx.send("erreur 1.")
+            await ctx.send("La rarete n'existe pas.")
             return
 
         # Requête pour vérifier s'il y a des cartes disponibles de la rareté déterminée
@@ -47,7 +47,7 @@ class Drop(commands.Cog):
         available_cards = cursor.fetchall()
 
         if not available_cards:
-            await ctx.send("erreur 2")
+            await ctx.send("Carte pas disponible")
             return
 
         # Requête pour obtenir une carte aléatoire de la rareté déterminée

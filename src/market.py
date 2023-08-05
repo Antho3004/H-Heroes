@@ -110,7 +110,7 @@ class MarketPlace(commands.Cog):
 
             embed = discord.Embed(
                 title="Vente",
-                description=f"The **{code_card}** is on sale for **{prix}** <:HCoins:1134169003657547847>.",
+                description=f"The card **{code_card}** is on sale for **{prix}** <:HCoins:1134169003657547847>",
                 color=discord.Color.green()
             )
             await ctx.send(embed=embed)
