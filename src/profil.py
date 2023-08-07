@@ -53,11 +53,9 @@ class Profil(commands.Cog):
             await ctx.send(embed=embed)
 
         embed = discord.Embed(title=f"{user.name}'s profile", description=description, color=discord.Color.blue())
-        embed.add_field(name="", value=f":moneybag: **Wallet** : {formatted_argent} <:HCoins:1134169003657547847>", inline=False)
-        embed.add_field(name="", value=f":flower_playing_cards: **Inventory** : {nombre_de_cartes}", inline=False)
-        embed.add_field(name="", value=f":heart: **Favorite card** : {carte_favori}\n\n", inline=False)
+        embed.add_field(name="", value=f":moneybag: **Wallet** : {formatted_argent} <:HCoins:1134169003657547847>\n:flower_playing_cards: **Inventory** : {nombre_de_cartes}\n:heart: **Favorite card** : {carte_favori}", inline=False)
         embed.add_field(name="PACKS", value=f"<:Bronze:1136312536665440387> **Bronze** : {packs_bronze}\n<:Argent:1136312524900401213>  **Silver** : {packs_silver}\n<:Gold:1136312506957189131> **Gold** : {packs_gold}\n<:Legendary:1136312609449193544> **Legendary** : {packs_legendaire}", inline=False)
-        embed.add_field(name="ACHIEVEMENT", value=f"soon\n", inline=False)
+        embed.add_field(name="ACHIEVEMENT", value=f"Soon\n", inline=False)
 
         await ctx.send(embed=embed)
 
