@@ -16,90 +16,178 @@ class MarketPlace(commands.Cog):
     @commands.command()
     async def mp(self, ctx, user: discord.Member = None, page: int = 1):
         if user is None:
-            user = ctx.author
+            cursor.execute("SELECT COUNT(*) FROM market")
+            count = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM market")
-        count = cursor.fetchone()[0]
+            if count > 0:
+                cursor.execute("SELECT i.user_id, i.groupe, i.nom, i.rarete, m.code_card, m.prix FROM market m JOIN user_inventaire i ON m.code_card = i.code_card ORDER BY i.groupe, i.nom")
+                result = cursor.fetchall()
 
-        if count > 0:
-            cursor.execute("SELECT i.user_id, i.groupe, i.nom, i.rarete, m.code_card, m.prix FROM market m JOIN user_inventaire i ON m.code_card = i.code_card ORDER BY i.groupe, i.nom")
-            result = cursor.fetchall()
+                items_per_page = 9
+                total_pages = (count + items_per_page - 1) // items_per_page
+                page = max(1, min(page, total_pages))
 
-            items_per_page = 9
-            total_pages = (count + items_per_page - 1) // items_per_page
-            page = max(1, min(page, total_pages))
+                start_idx = (page - 1) * items_per_page
+                end_idx = min(start_idx + items_per_page, count)
 
-            start_idx = (page - 1) * items_per_page
-            end_idx = min(start_idx + items_per_page, count)
+                embed = discord.Embed(title=f"Marketplace", color=discord.Color.blue())
 
-            embed = discord.Embed(title=f"Marketplace", color=discord.Color.blue())
+                rarity_emojis = {
+                    "C": "<:C_:1107771999490686987>",
+                    "U": "<:U_:1107772008193867867>",
+                    "R": "<:R_:1107772004410601553>",
+                    "E": "<:E_:1107772001747222550>",
+                    "L": "<:L_:1107772002690945055>"
+                }
 
-            rarity_emojis = {
-                "C": "<:C_:1107771999490686987>",
-                "U": "<:U_:1107772008193867867>",
-                "R": "<:R_:1107772004410601553>",
-                "E": "<:E_:1107772001747222550>",
-                "L": "<:L_:1107772002690945055>"
-            }
+                for i in range(start_idx, end_idx):
+                    row = result[i]
+                    user_id = row[0]
+                    groupe = row[1]
+                    nom = row[2]
+                    rarete = row[3]
+                    code_card = row[4]
+                    prix = row[5]
 
-            for i in range(start_idx, end_idx):
-                row = result[i]
-                user_id = row[0]
-                groupe = row[1]
-                nom = row[2]
-                rarete = row[3]
-                code_card = row[4]
-                prix = row[5]
+                    formatted_argent = self.format_money(prix)
 
-                formatted_argent = self.format_money(prix)
+                    rarity_emoji = rarity_emojis.get(rarete, "")
 
-                rarity_emoji = rarity_emojis.get(rarete, "")
+                    embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {formatted_argent} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
+                embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
+                msg = await ctx.send(embed=embed)
 
-                embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {formatted_argent} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
-            embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
-            msg = await ctx.send(embed=embed)
+                if total_pages > 1:
+                    await msg.add_reaction("⬅️")
+                    await msg.add_reaction("➡️")
 
-            if total_pages > 1:
-                await msg.add_reaction("⬅️")
-                await msg.add_reaction("➡️")
+                    def check(reaction, user):
+                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
 
-                def check(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+                    while True:
+                        try:
+                            reaction, _ = await self.bot.wait_for("reaction_add", timeout=180.0, check=check)
 
-                while True:
-                    try:
-                        reaction, _ = await self.bot.wait_for("reaction_add", timeout=180.0, check=check)
+                            if str(reaction.emoji) == "➡️" and page < total_pages:
+                                page += 1
+                            elif str(reaction.emoji) == "⬅️" and page > 1:
+                                page -= 1
+                            
+                            start_idx = (page - 1) * items_per_page
+                            end_idx = min(start_idx + items_per_page, count)
+                            embed.clear_fields()
+                            for i in range(start_idx, end_idx):
+                                row = result[i]
+                                user_id = row[0]
+                                groupe = row[1]
+                                nom = row[2]
+                                rarete = row[3]
+                                code_card = row[4]
+                                prix = row[5]
 
-                        if str(reaction.emoji) == "➡️" and page < total_pages:
-                            page += 1
-                        elif str(reaction.emoji) == "⬅️" and page > 1:
-                            page -= 1
-                        
-                        start_idx = (page - 1) * items_per_page
-                        end_idx = min(start_idx + items_per_page, count)
-                        embed.clear_fields()
-                        for i in range(start_idx, end_idx):
-                            row = result[i]
-                            user_id = row[0]
-                            groupe = row[1]
-                            nom = row[2]
-                            rarete = row[3]
-                            code_card = row[4]
-                            prix = row[5]
+                                rarity_emoji = rarity_emojis.get(rarete, "")
 
-                            rarity_emoji = rarity_emojis.get(rarete, "")
+                                embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {prix} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
+                            embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
+                            await msg.edit(embed=embed)
 
-                            embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {prix} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
-                        embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
-                        await msg.edit(embed=embed)
+                            # Reset reaction count to 1
+                            await reaction.remove(ctx.author)
 
-                    except asyncio.TimeoutError:
-                        await msg.clear_reactions()
-                        break
+                        except asyncio.TimeoutError:
+                            await msg.clear_reactions()
+                            break
 
+            else:
+                embed = discord.Embed(title="Marketplace", description="Marketplace is empty.", color=discord.Color.red())
+                await ctx.send(embed=embed)
+        
         else:
-            embed = discord.Embed(title="Marketplace", description="Marketplace is empty.", color=discord.Color.red())
-            await ctx.send(embed=embed)
+            cursor.execute("SELECT COUNT(*) FROM market m JOIN user_inventaire i ON m.code_card = i.code_card WHERE i.user_id = ?", (user.id,))
+            count = cursor.fetchone()[0]
+
+            if count > 0:
+                cursor.execute("SELECT i.user_id, i.groupe, i.nom, i.rarete, m.code_card, m.prix FROM market m JOIN user_inventaire i ON m.code_card = i.code_card WHERE i.user_id = ? ORDER BY i.groupe, i.nom", (user.id,))
+                result = cursor.fetchall()
+
+                items_per_page = 9
+                total_pages = (count + items_per_page - 1) // items_per_page
+                page = max(1, min(page, total_pages))
+
+                start_idx = (page - 1) * items_per_page
+                end_idx = min(start_idx + items_per_page, count)
+
+                embed = discord.Embed(title=f"Marketplace", color=discord.Color.blue())
+
+                rarity_emojis = {
+                    "C": "<:C_:1107771999490686987>",
+                    "U": "<:U_:1107772008193867867>",
+                    "R": "<:R_:1107772004410601553>",
+                    "E": "<:E_:1107772001747222550>",
+                    "L": "<:L_:1107772002690945055>"
+                }
+
+                for i in range(start_idx, end_idx):
+                    row = result[i]
+                    user_id = row[0]
+                    groupe = row[1]
+                    nom = row[2]
+                    rarete = row[3]
+                    code_card = row[4]
+                    prix = row[5]
+
+                    formatted_argent = self.format_money(prix)
+
+                    rarity_emoji = rarity_emojis.get(rarete, "")
+
+                    embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {formatted_argent} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
+                embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
+                msg = await ctx.send(embed=embed)
+
+                if total_pages > 1:
+                    await msg.add_reaction("⬅️")
+                    await msg.add_reaction("➡️")
+
+                    def check(reaction, user):
+                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+
+                    while True:
+                        try:
+                            reaction, _ = await self.bot.wait_for("reaction_add", timeout=180.0, check=check)
+
+                            if str(reaction.emoji) == "➡️" and page < total_pages:
+                                page += 1
+                            elif str(reaction.emoji) == "⬅️" and page > 1:
+                                page -= 1
+                            
+                            start_idx = (page - 1) * items_per_page
+                            end_idx = min(start_idx + items_per_page, count)
+                            embed.clear_fields()
+                            for i in range(start_idx, end_idx):
+                                row = result[i]
+                                user_id = row[0]
+                                groupe = row[1]
+                                nom = row[2]
+                                rarete = row[3]
+                                code_card = row[4]
+                                prix = row[5]
+
+                                rarity_emoji = rarity_emojis.get(rarete, "")
+
+                                embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {prix} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
+                            embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
+                            await msg.edit(embed=embed)
+
+                            # Reset reaction count to 1
+                            await reaction.remove(ctx.author)
+
+                        except asyncio.TimeoutError:
+                            await msg.clear_reactions()
+                            break
+
+            else:
+                embed = discord.Embed(title="Marketplace", description="Marketplace is empty.", color=discord.Color.red())
+                await ctx.send(embed=embed)
 
     @commands.command()
     async def sell(self, ctx, code_card, prix):
