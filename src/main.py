@@ -10,6 +10,7 @@ class Bot(commands.Bot):
 
     async def setup_hook(self) -> None:
         await self.load_extension("start")
+        await self.load_extension("help")
         await self.load_extension("profil")
         await self.load_extension("balance")
         await self.load_extension("work")
@@ -38,6 +39,7 @@ def main () -> None:
         raise ValueError("Le token n'est pas défini")
     
     bot = Bot()
+    bot.remove_command('help')
     bot.run(token=TOKEN)
 
 if __name__ == "__main__":
