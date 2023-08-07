@@ -9,6 +9,9 @@ cursor = connection.cursor()
 class MarketPlace(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+    
+    def format_money(self, money):
+        return "{:,}".format(money).replace(",", " ")
 
     @commands.command()
     async def mp(self, ctx, user: discord.Member = None, page: int = 1):
@@ -48,9 +51,11 @@ class MarketPlace(commands.Cog):
                 code_card = row[4]
                 prix = row[5]
 
+                formatted_argent = self.format_money(prix)
+
                 rarity_emoji = rarity_emojis.get(rarete, "")
 
-                embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {prix} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
+                embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {formatted_argent} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
             embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
             msg = await ctx.send(embed=embed)
 
@@ -99,27 +104,51 @@ class MarketPlace(commands.Cog):
     @commands.command()
     async def sell(self, ctx, code_card, prix):
         user = ctx.author
+        
+        # Vérifier si le prix est un nombre valide
+        try:
+            prix = int(prix)
+        except ValueError:
+            embed = discord.Embed(
+                title="Marketplace",
+                description="Please enter a valid price.",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
+            return
+        
         # Vérifier si l'utilisateur possède la carte qu'il souhaite vendre
         cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND code_card = ?", (user.id, code_card))
         sell_card = cursor.fetchone()
 
+        # Vérifier si l'utilisateur a déjà cette carte en vente dans le marché
+        cursor.execute("SELECT m.code_card FROM market m JOIN user_inventaire i ON m.code_card = i.code_card WHERE i.user_id = ? and m.code_card = ?", (user.id, code_card))
+        existing_sale = cursor.fetchone()
+
         if sell_card is not None:
-            # Insérer les informations de la carte dans la table "market"
-            cursor.execute("INSERT INTO market (code_card, prix) VALUES (?, ?)", (code_card, prix))
+            if existing_sale:
+                # Remplacer la carte déjà en vente par la nouvelle valeur
+                cursor.execute("UPDATE market SET prix = ? where code_card = ?", (prix, code_card))
+            else:
+                # Insérer les informations de la carte dans la table "market"
+                cursor.execute("INSERT INTO market (code_card, prix) VALUES (?, ?)", (code_card, prix))
+
             connection.commit()
 
+            formatted_argent = self.format_money(prix)
+
             embed = discord.Embed(
-                title="Vente",
-                description=f"The card **{code_card}** is on sale for **{prix}** <:HCoins:1134169003657547847>",
+                title="Marketplace",
+                description=f"The card `{code_card}` is on sale for **{formatted_argent}** <:HCoins:1134169003657547847>",
                 color=discord.Color.green()
             )
             await ctx.send(embed=embed)
-        else :
+        else:
             embed = discord.Embed(
                 title="Vente",
-                description=f"You do not have the card : **{code_card}**",
+                description=f"You do not have the card: `{code_card}`",
                 color=discord.Color.red()
-            )  
+            )
             await ctx.send(embed=embed)
 
     @commands.command()
@@ -152,8 +181,10 @@ class MarketPlace(commands.Cog):
                     cursor.execute("DELETE FROM market WHERE code_card = ?", (code_card,))
                     connection.commit()
 
+                    formatted_argent = self.format_money(card_price)
+
                     embed = discord.Embed(
-                        description=f"You have purchased the **{code_card}** for **{card_price}** <:HCoins:1134169003657547847>", color=discord.Color.green()
+                        description=f"You have purchased the **{code_card}** for **{formatted_argent}** <:HCoins:1134169003657547847>", color=discord.Color.green()
                     )
                     await ctx.send(embed=embed)
                 else:
