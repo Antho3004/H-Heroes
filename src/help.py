@@ -9,7 +9,7 @@ class Help(commands.Cog):
     async def help(self, ctx):
         
         embed = discord.Embed(title="HELP", color=discord.Color.orange())
-        embed.add_field(name="COMMAND LIST", value=f"`$start` : Allows you to create an account.\n`$drop` : Gives you a random card every 10 minutes.\n\
+        embed.add_field(name="COMMAND LIST", value=f"`$start` : Allows you to create an account.\n`$drop` : Gives you a random card every 5 minutes.\n\
                         `$work` : Earn money every 30 minutes.\n`$view` : Displays information, statistics, and the current card.\n\
                         `$daily`: Grants money or a card once every 24 hours.\n`$profile or $pr` : Shows your profile.\n\
                         `$description` : Changes your profile description.\n`$bal` : Displays the currency in your account.\n\

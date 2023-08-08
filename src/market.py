@@ -97,7 +97,6 @@ class MarketPlace(commands.Cog):
                         except asyncio.TimeoutError:
                             await msg.clear_reactions()
                             break
-
             else:
                 embed = discord.Embed(title="Marketplace", description="Marketplace is empty.", color=discord.Color.red())
                 await ctx.send(embed=embed)
@@ -184,7 +183,6 @@ class MarketPlace(commands.Cog):
                         except asyncio.TimeoutError:
                             await msg.clear_reactions()
                             break
-
             else:
                 embed = discord.Embed(title="Marketplace", description="Marketplace is empty.", color=discord.Color.red())
                 await ctx.send(embed=embed)

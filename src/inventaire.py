@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from typing import List
 import sqlite3
 import asyncio
 
