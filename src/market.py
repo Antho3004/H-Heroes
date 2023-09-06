@@ -43,7 +43,7 @@ class MarketPlace(commands.Cog):
                         cards_in_line = chunk[i:i + 3]
                         for line in cards_in_line:
                             embed.add_field(
-                                name=f"{line[1]} {line[2]} {rarity_emojis.get(line[3], '')}",
+                                name=f"{line[1]} - {line[2]} {rarity_emojis.get(line[3], '')}",
                                 value=f"{line[4]}\nPrice : {self.format_money(line[5])} <:HCoins:1134169003657547847>\n<@{line[0]}>",
                                 inline=True
                             )
@@ -88,7 +88,7 @@ class MarketPlace(commands.Cog):
 
                         for line in cards_in_line:
                             embed.add_field(
-                                name=f"{line[1]} {line[2]} {rarity_emojis.get(line[3], '')}",
+                                name=f"{line[1]} - {line[2]} {rarity_emojis.get(line[3], '')}",
                                 value=f"{line[4]}\nPrice : {self.format_money(line[5])} <:HCoins:1134169003657547847>\n<@{line[0]}>",
                                 inline=True
                             )
