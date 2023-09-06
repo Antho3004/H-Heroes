@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import sqlite3
-import asyncio
+from dispie import Paginator
 
 connection = sqlite3.connect("HallyuHeroes.db")
 cursor = connection.cursor()
@@ -9,12 +9,12 @@ cursor = connection.cursor()
 class MarketPlace(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
     def format_money(self, money):
         return "{:,}".format(money).replace(",", " ")
 
     @commands.command()
-    async def mp(self, ctx, user: discord.Member = None, page: int = 1):
+    async def mp(self, ctx: commands.Context, user: discord.Member = None, page: int = 1):
         if user is None:
             cursor.execute("SELECT COUNT(*) FROM market")
             count = cursor.fetchone()[0]
@@ -23,15 +23,6 @@ class MarketPlace(commands.Cog):
                 cursor.execute("SELECT i.user_id, i.groupe, i.nom, i.rarete, m.code_card, m.prix FROM market m JOIN user_inventaire i ON m.code_card = i.code_card ORDER BY i.groupe, i.nom")
                 result = cursor.fetchall()
 
-                items_per_page = 9
-                total_pages = (count + items_per_page - 1) // items_per_page
-                page = max(1, min(page, total_pages))
-
-                start_idx = (page - 1) * items_per_page
-                end_idx = min(start_idx + items_per_page, count)
-
-                embed = discord.Embed(title=f"Marketplace", color=discord.Color.blue())
-
                 rarity_emojis = {
                     "C": "<:C_:1107771999490686987>",
                     "U": "<:U_:1107772008193867867>",
@@ -40,67 +31,34 @@ class MarketPlace(commands.Cog):
                     "L": "<:L_:1107772002690945055>"
                 }
 
-                for i in range(start_idx, end_idx):
-                    row = result[i]
-                    user_id = row[0]
-                    groupe = row[1]
-                    nom = row[2]
-                    rarete = row[3]
-                    code_card = row[4]
-                    prix = row[5]
+                # Divisez vos données en morceaux de 9 cartes par page
+                chunks = [result[i:i + 9] for i in range(0, len(result), 9)]
 
-                    formatted_argent = self.format_money(prix)
+                embeds = []  # Initialisez la liste d'embeds en dehors de la boucle
 
-                    rarity_emoji = rarity_emojis.get(rarete, "")
+                for chunk in chunks:
+                    embed = discord.Embed(title=f"Marketplace", color=discord.Color.blue())
+                    
+                    for i in range(0, len(chunk), 3):
+                        cards_in_line = chunk[i:i + 3]
+                        for line in cards_in_line:
+                            embed.add_field(
+                                name=f"{line[1]} {line[2]} {rarity_emojis.get(line[3], '')}",
+                                value=f"{line[4]}\nPrice : {self.format_money(line[5])} <:HCoins:1134169003657547847>\n<@{line[0]}>",
+                                inline=True
+                            )
+                    embed.set_footer(text=f"Total cards: {count}")
+                    embeds.append(embed)
 
-                    embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {formatted_argent} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
-                embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
-                msg = await ctx.send(embed=embed)
+                # Créez un objet Paginator en passant la liste d'embeds
+                paginator = Paginator(embeds)
 
-                if total_pages > 1:
-                    await msg.add_reaction("⬅️")
-                    await msg.add_reaction("➡️")
+                # Démarrez la pagination
+                await paginator.start(ctx)
 
-                    def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
-
-                    while True:
-                        try:
-                            reaction, _ = await self.bot.wait_for("reaction_add", timeout=180.0, check=check)
-
-                            if str(reaction.emoji) == "➡️" and page < total_pages:
-                                page += 1
-                            elif str(reaction.emoji) == "⬅️" and page > 1:
-                                page -= 1
-                            
-                            start_idx = (page - 1) * items_per_page
-                            end_idx = min(start_idx + items_per_page, count)
-                            embed.clear_fields()
-                            for i in range(start_idx, end_idx):
-                                row = result[i]
-                                user_id = row[0]
-                                groupe = row[1]
-                                nom = row[2]
-                                rarete = row[3]
-                                code_card = row[4]
-                                prix = row[5]
-
-                                rarity_emoji = rarity_emojis.get(rarete, "")
-
-                                embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {prix} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
-                            embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
-                            await msg.edit(embed=embed)
-
-                            # Reset reaction count to 1
-                            await reaction.remove(ctx.author)
-
-                        except asyncio.TimeoutError:
-                            await msg.clear_reactions()
-                            break
             else:
                 embed = discord.Embed(title="Marketplace", description="Marketplace is empty.", color=discord.Color.red())
                 await ctx.send(embed=embed)
-        
         else:
             cursor.execute("SELECT COUNT(*) FROM market m JOIN user_inventaire i ON m.code_card = i.code_card WHERE i.user_id = ?", (user.id,))
             count = cursor.fetchone()[0]
@@ -109,15 +67,6 @@ class MarketPlace(commands.Cog):
                 cursor.execute("SELECT i.user_id, i.groupe, i.nom, i.rarete, m.code_card, m.prix FROM market m JOIN user_inventaire i ON m.code_card = i.code_card WHERE i.user_id = ? ORDER BY i.groupe, i.nom", (user.id,))
                 result = cursor.fetchall()
 
-                items_per_page = 9
-                total_pages = (count + items_per_page - 1) // items_per_page
-                page = max(1, min(page, total_pages))
-
-                start_idx = (page - 1) * items_per_page
-                end_idx = min(start_idx + items_per_page, count)
-
-                embed = discord.Embed(title=f"Marketplace", color=discord.Color.blue())
-
                 rarity_emojis = {
                     "C": "<:C_:1107771999490686987>",
                     "U": "<:U_:1107772008193867867>",
@@ -126,63 +75,32 @@ class MarketPlace(commands.Cog):
                     "L": "<:L_:1107772002690945055>"
                 }
 
-                for i in range(start_idx, end_idx):
-                    row = result[i]
-                    user_id = row[0]
-                    groupe = row[1]
-                    nom = row[2]
-                    rarete = row[3]
-                    code_card = row[4]
-                    prix = row[5]
+                # Divisez vos données en morceaux de 9 cartes par page
+                chunks = [result[i:i + 9] for i in range(0, len(result), 9)]
 
-                    formatted_argent = self.format_money(prix)
+                embeds = []  # Initialisez la liste d'embeds en dehors de la boucle
 
-                    rarity_emoji = rarity_emojis.get(rarete, "")
+                for chunk in chunks:
+                    embed = discord.Embed(title=f"Marketplace", color=discord.Color.blue())
+                    
+                    for i in range(0, len(chunk), 3):
+                        cards_in_line = chunk[i:i + 3]
 
-                    embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {formatted_argent} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
-                embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
-                msg = await ctx.send(embed=embed)
+                        for line in cards_in_line:
+                            embed.add_field(
+                                name=f"{line[1]} {line[2]} {rarity_emojis.get(line[3], '')}",
+                                value=f"{line[4]}\nPrice : {self.format_money(line[5])} <:HCoins:1134169003657547847>\n<@{line[0]}>",
+                                inline=True
+                            )
+                    embed.set_footer(text=f"Total cards: {count}")
+                    embeds.append(embed)
 
-                if total_pages > 1:
-                    await msg.add_reaction("⬅️")
-                    await msg.add_reaction("➡️")
+                # Créez un objet Paginator en passant la liste d'embeds
+                paginator = Paginator(embeds)
 
-                    def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) in ["⬅️", "➡️"]
+                # Démarrez la pagination
+                await paginator.start(ctx)
 
-                    while True:
-                        try:
-                            reaction, _ = await self.bot.wait_for("reaction_add", timeout=180.0, check=check)
-
-                            if str(reaction.emoji) == "➡️" and page < total_pages:
-                                page += 1
-                            elif str(reaction.emoji) == "⬅️" and page > 1:
-                                page -= 1
-                            
-                            start_idx = (page - 1) * items_per_page
-                            end_idx = min(start_idx + items_per_page, count)
-                            embed.clear_fields()
-                            for i in range(start_idx, end_idx):
-                                row = result[i]
-                                user_id = row[0]
-                                groupe = row[1]
-                                nom = row[2]
-                                rarete = row[3]
-                                code_card = row[4]
-                                prix = row[5]
-
-                                rarity_emoji = rarity_emojis.get(rarete, "")
-
-                                embed.add_field(name=f"**{groupe}** **{nom}** {rarity_emoji}", value=f"{code_card}\nPrice : {prix} <:HCoins:1134169003657547847>\n<@{user_id}>",inline=True)
-                            embed.set_footer(text=f"Page {page}/{total_pages} - Total cards in the marketplace: {count}")
-                            await msg.edit(embed=embed)
-
-                            # Reset reaction count to 1
-                            await reaction.remove(ctx.author)
-
-                        except asyncio.TimeoutError:
-                            await msg.clear_reactions()
-                            break
             else:
                 embed = discord.Embed(title="Marketplace", description="Marketplace is empty.", color=discord.Color.red())
                 await ctx.send(embed=embed)
