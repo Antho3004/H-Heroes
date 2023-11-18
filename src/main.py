@@ -6,7 +6,7 @@ import database
 
 class Bot(commands.Bot):
     def __init__(self) -> None:
-        super().__init__(command_prefix="$", intents=discord.Intents.all())
+        super().__init__(command_prefix=";", intents=discord.Intents.all())
 
     async def setup_hook(self) -> None:
         await self.load_extension("start")
@@ -16,7 +16,9 @@ class Bot(commands.Bot):
         await self.load_extension("work")
         await self.load_extension("inventaire")
         await self.load_extension("drop")
+        await self.load_extension("burn")
         await self.load_extension("view")
+        await self.load_extension("preview")
         await self.load_extension("favorite")
         await self.load_extension("market")
         await self.load_extension("trade")

@@ -15,7 +15,8 @@ class Inventaire(commands.Cog):
         count = cursor.fetchone()[0]
 
         if count > 0:
-            cursor.execute("SELECT code_card, nom, groupe, rarete FROM user_inventaire WHERE user_id = ? ORDER BY groupe, nom", (str(user.id),))
+            cursor.execute("SELECT code_card, nom, groupe, rarete FROM user_inventaire WHERE user_id = ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id),))
+
             result = cursor.fetchall()
 
             rarity_emojis = {
