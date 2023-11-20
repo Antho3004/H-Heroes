@@ -11,20 +11,18 @@ class View(commands.Cog):
 
     @commands.command()
     async def view(self, ctx, code_card: str):
-        user = ctx.author
-
-        # Vérifier si l'utilisateur possède la carte
-        cursor.execute("SELECT * FROM user_inventaire WHERE user_id = ? AND code_card = ?", (user.id, code_card))
+        # Supprimer la vérification si l'utilisateur possède la carte
+        cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ?", (code_card,))
         card_data = cursor.fetchone()
-        
+
         if not card_data:
             embed = discord.Embed(title="", color=discord.Color.red())
-            embed.add_field(name="You don't have this card", value="")
+            embed.add_field(name="No one has this card", value="")
             await ctx.send(embed=embed)
             return
 
         # Extraire les informations de la carte
-        user_id, card_code, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url, event = card_data
+        user_id, _, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url, event = card_data
 
         # Créer l'embed pour afficher les détails de la carte
         embed = discord.Embed(title="CARD'S DETAILS", description=f"**CODE** : {code_card}\n**NAME** : {nom}\n**GROUP** : {groupe}\n**VERSION** : {version}\n**OWNER** : <@{user_id}>\n" ,color=discord.Color.blue())
