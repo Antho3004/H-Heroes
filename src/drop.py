@@ -26,28 +26,26 @@ class Drop(commands.Cog):
 
         # Calculer le pourcentage total de drop (100%)
         total_drop_rate = sum(rarity_drop_rates.values())
-
+        print(total_drop_rate)
         # Obtenir un nombre aléatoire entre 1 et 100 pour déterminer la rareté
         drop_chance = random.randint(1, total_drop_rate + 1)
+        print(drop_chance)
 
         # Déterminer la rareté de la carte en fonction du nombre aléatoire obtenu
         rarity = None
         for rarete, drop_rate in rarity_drop_rates.items():
             if drop_chance <= drop_rate:
                 rarity = rarete
+                print(rarity)
                 break
             drop_chance -= drop_rate
-
-        if not rarity:
-            await ctx.send("La rarete n'existe pas.")
-            return
 
         # Requête pour vérifier s'il y a des cartes disponibles de la rareté déterminée
         cursor.execute("SELECT code_card FROM cards WHERE rarete = ?", (rarity))
         available_cards = cursor.fetchall()
 
         if not available_cards:
-            await ctx.send("Carte pas disponible")
+            await ctx.send("Si vous voyez ce message ça veut dire que c'est pas normal")
             return
 
         # Requête pour obtenir une carte aléatoire de la rareté déterminée
@@ -143,7 +141,7 @@ class Drop(commands.Cog):
         title = f"**DROP**"
 
         # Crée le message à envoyer après avoir dropé la carte
-        drop_message = f"Congratulations {ctx.author.mention}\nYou have dropped: [{groupe} {card_name} - {rarity_emoji} ] n° {code_card.split('-')[1]}"
+        drop_message = f"Congratulations {ctx.author.mention}\nYou have dropped: [{groupe} {card_name} - {rarity_emoji} ] n° {code_card.split('-')[1]}\nCode : `{code_card}`"
 
         # Crée l'embed Discord avec le titre, le message et l'image de la carte
         embed = discord.Embed(title=title, description=drop_message)
