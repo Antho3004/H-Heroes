@@ -26,17 +26,16 @@ class Drop(commands.Cog):
 
         # Calculer le pourcentage total de drop (100%)
         total_drop_rate = sum(rarity_drop_rates.values())
-        print(total_drop_rate)
+        
         # Obtenir un nombre aléatoire entre 1 et 100 pour déterminer la rareté
         drop_chance = random.randint(1, total_drop_rate + 1)
-        print(drop_chance)
+        
 
         # Déterminer la rareté de la carte en fonction du nombre aléatoire obtenu
         rarity = None
         for rarete, drop_rate in rarity_drop_rates.items():
             if drop_chance <= drop_rate:
                 rarity = rarete
-                print(rarity)
                 break
             drop_chance -= drop_rate
 
