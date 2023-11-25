@@ -124,7 +124,7 @@ class Shop(commands.Cog):
             if pack_name_lower == "bronze":
                 rarity_drop_rates = {
                     "C": 50,
-                    "U": 50,
+                    "U": 30,
                     "R": 20
                 }
             elif pack_name_lower == "silver":
