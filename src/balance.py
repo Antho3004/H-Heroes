@@ -21,14 +21,14 @@ class Balance(commands.Cog):
         result = cursor.fetchone()
 
         if result is None:
-            await ctx.send(f"{user.display_name} doesn't have any money yet.")
-            return
+            embed = discord.Embed(title=f"Balance of {user.name}", description=f"{user.mention} doesn't have any money yet.")
+            await ctx.send(embed=embed)
 
         money = result[0]
 
         formatted_balance = self.format_balance(money)
 
-        embed = discord.Embed(title=f"{user.name}", description=f"{ctx.author.mention} has **{formatted_balance}** <:HCoins:1134169003657547847>")
+        embed = discord.Embed(title=f"Balance of {user.name}", description=f"{user.mention} has **{formatted_balance}** <:HCoins:1134169003657547847>")
         await ctx.send(embed=embed)
 
 async def setup(bot):
