@@ -12,10 +12,10 @@ class Shop(commands.Cog):
         # Créez un embed pour afficher les packs
         embed = discord.Embed(title="SHOP", description="", color=discord.Color.blue())
 
-        embed.add_field(name="", value=f"<:Bronze:1136312536665440387> **Bronze** : 3000 <:HCoins:1134169003657547847>", inline=False)
-        embed.add_field(name="", value=f"<:Argent:1136312524900401213> **Silver** : 7000 <:HCoins:1134169003657547847>", inline=False)
-        embed.add_field(name="", value=f"<:Gold:1136312506957189131> **Gold** : 20000 <:HCoins:1134169003657547847>", inline=False)
-        embed.add_field(name="", value=f"<:Legendary:1136312609449193544> **Legendary** : 50000 <:HCoins:1134169003657547847>", inline=False)
+        embed.add_field(name="", value=f"<:Bronze:1136312536665440387> **Bronze** (5 cards C/U/R): **3000** <:HCoins:1134169003657547847>", inline=False)
+        embed.add_field(name="", value=f"<:Argent:1136312524900401213> **Silver** (5 cards U/R/E): **7000** <:HCoins:1134169003657547847>", inline=False)
+        embed.add_field(name="", value=f"<:Gold:1136312506957189131> **Gold** (5 cards R/E/L) : **20000** <:HCoins:1134169003657547847>", inline=False)
+        embed.add_field(name="", value=f"<:Legendary:1136312609449193544> **Legendary** (5 cards L): **50000** <:HCoins:1134169003657547847>", inline=False)
 
         # Envoyez l'embed
         await ctx.send(embed=embed)
@@ -165,7 +165,7 @@ class Shop(commands.Cog):
                 result = cursor.fetchone()
 
                 if not result:
-                    await ctx.send("erreur 3.")
+                    await ctx.send("Erreur car il n'y a pas la rarete dispo dans le jeu")
                     return
 
                 code_card, card_name, groupe, version, url_image = result
