@@ -38,6 +38,10 @@ class Drop(commands.Cog):
                 rarity = rarete
                 break
             drop_chance -= drop_rate
+        
+        if not rarity:
+            await ctx.send(rarity)
+            return
 
         # Requête pour vérifier s'il y a des cartes disponibles de la rareté déterminée
         cursor.execute("SELECT code_card FROM cards WHERE rarete = ?", (rarity))
