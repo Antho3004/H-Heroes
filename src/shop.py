@@ -189,6 +189,7 @@ class Shop(commands.Cog):
                         except ValueError:
                             pass
 
+                # Modifier les colonnes chant, dance, rap, acting et modeling avec des valeurs aléatoires en fonction de la rareté
                 chant = random.randint(0, 100)
                 dance = random.randint(0, 100)
                 rap = random.randint(0, 100)
@@ -207,6 +208,18 @@ class Shop(commands.Cog):
                     rap = random.randint(150, 200)
                     acting = random.randint(150, 200)
                     modeling = random.randint(150, 200)
+                elif rarity == "E":
+                    chant = random.randint(200, 250)
+                    dance = random.randint(200, 250)
+                    rap = random.randint(200, 250)
+                    acting = random.randint(200, 250)
+                    modeling = random.randint(200, 250)
+                elif rarity == "L":
+                    chant = random.randint(250, 300)
+                    dance = random.randint(250, 300)
+                    rap = random.randint(250, 300)
+                    acting = random.randint(250, 300)
+                    modeling = random.randint(250, 300)
 
                 existing_card = cursor.execute("SELECT code_card FROM user_inventaire WHERE code_card = ?", (code_card,)).fetchone()
                 if existing_card:
@@ -229,7 +242,7 @@ class Shop(commands.Cog):
                 })
 
             # Afficher les cartes obtenues dans le message
-            card_list_message = "\n".join([f"- {card['groupe']} {card['card_name']} {self.get_rarity_emoji(card['rarity'])} n° {card['code_card'].split('-')[1]} `{code_card}`" for card in cards])
+            card_list_message = "\n".join([f"- {card['groupe']} {card['card_name']} {self.get_rarity_emoji(card['rarity'])} n° {card['code_card'].split('-')[1]} `{card['code_card']}`" for card in cards])
 
             # Créer l'embed Discord
             embed = discord.Embed(title="Opened Pack", description=f"Congratulations {ctx.author.mention}\nYou have opened a {pack_name} pack and obtained the following cards:\n{card_list_message}", color=discord.Color.green())
