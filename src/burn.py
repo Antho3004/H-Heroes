@@ -15,6 +15,7 @@ class Burn(commands.Cog):
     async def burn(self, ctx, *codes_cards: str):
         user_id = ctx.author.id
         total_money_reward = 0  # Variable pour stocker la somme totale d'argent gagnée
+        error_occurred = False  # Indicateur d'erreur
 
         for code_card in codes_cards:
             # Check if the user has the card in their inventory
@@ -24,6 +25,17 @@ class Burn(commands.Cog):
             if not existing_card:
                 embed = Embed(title="Card Burning Error", description=f"You do not have the card `{code_card}` in your inventory", color=discord.Color.red())
                 await ctx.send(embed=embed)
+                error_occurred = True  # Une erreur s'est produite
+                continue  # Move to the next card in case of error
+
+            # Check if the card is in the market
+            cursor.execute("SELECT * FROM market WHERE code_card = ?", (code_card,))
+            card_in_market = cursor.fetchone()
+
+            if card_in_market:
+                embed = Embed(title="Card Burning Error", description=f"You must remove the card `{code_card}` from the marketplace before burning it", color=discord.Color.red())
+                await ctx.send(embed=embed)
+                error_occurred = True  # Une erreur s'est produite
                 continue  # Move to the next card in case of error
 
             # Get the amount of money to add (for example, 50 to illustrate, you can adjust this)
@@ -48,9 +60,10 @@ class Burn(commands.Cog):
 
         connection.commit()
 
-        # Confirmation message in an embed with the total money reward
-        embed = Embed(title="Cards Burned Successfully", description=f"You burned **{len(codes_cards)}** cards and gained a total of **{total_money_reward}** <:HCoins:1134169003657547847>", color=discord.Color.green())
-        await ctx.send(embed=embed)
+        if not error_occurred:  # Exécuter seulement si aucune erreur ne s'est produite
+            # Confirmation message in an embed with the total money reward
+            embed = Embed(title="Cards Burned Successfully", description=f"You burned **{len(codes_cards)}** cards and gained a total of **{total_money_reward}** <:HCoins:1134169003657547847>", color=discord.Color.green())
+            await ctx.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Burn(bot))
