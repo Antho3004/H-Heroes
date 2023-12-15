@@ -23,6 +23,9 @@ class Inventaire(commands.Cog):
         elif filter_type == "rarity":
             # Filtrer par groupe
             cursor.execute(f"SELECT COUNT(*) FROM user_inventaire WHERE user_id = ? AND LOWER(rarete) = ?", (str(user.id), filter_value))
+        elif filter_type == "event":
+            # Filtrer par event
+            cursor.execute(f"SELECT COUNT(*) FROM user_inventaire WHERE user_id = ? AND LOWER(event) = ?", (str(user.id), filter_value))
         else:
             # Pas de filtre, afficher tous les éléments
             cursor.execute(f"SELECT COUNT(*) FROM user_inventaire WHERE user_id = ?", (str(user.id),))
@@ -37,6 +40,8 @@ class Inventaire(commands.Cog):
                     cursor.execute(f"SELECT code_card, nom, groupe, rarete, event FROM user_inventaire WHERE user_id = ? AND LOWER(groupe) = ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id), filter_value))
                 elif filter_type == "rarity":
                     cursor.execute(f"SELECT code_card, nom, groupe, rarete, event FROM user_inventaire WHERE user_id = ? AND LOWER(rarete) = ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id), filter_value))
+                elif filter_type == "event":
+                    cursor.execute(f"SELECT code_card, nom, groupe, rarete, event FROM user_inventaire WHERE user_id = ? AND LOWER(event) = ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id), filter_value))
             else:
                 cursor.execute(f"SELECT code_card, nom, groupe, rarete, event FROM user_inventaire WHERE user_id = ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id),))
 
@@ -91,9 +96,16 @@ class Inventaire(commands.Cog):
             user = ctx.guild.get_member(int(user.id))
 
         if filter_arg:
-            # Séparer le type de filtre et la valeur du filtre en utilisant le signe égal (=) comme séparateur
-            filter_type, filter_value = filter_arg.split("=")
-            await self.show_inventory(ctx, user, filter_type.lower(), filter_value)
+            # Utiliser split("=") une seule fois pour séparer le type de filtre et la valeur du filtre
+            filter_parts = filter_arg.split("=")
+
+            # Le type de filtre est la première partie
+            filter_type = filter_parts[0].lower()
+
+            # La valeur du filtre est le reste de la chaîne, y compris les espaces
+            filter_value = "=".join(filter_parts[1:])
+
+            await self.show_inventory(ctx, user, filter_type, filter_value)
         else:
             await self.show_inventory(ctx, user, None, None)
 
@@ -106,9 +118,16 @@ class Inventaire(commands.Cog):
             user = ctx.guild.get_member(int(user.id))
 
         if filter_arg:
-            # Séparer le type de filtre et la valeur du filtre en utilisant le signe égal (=) comme séparateur
-            filter_type, filter_value = filter_arg.split("=")
-            await self.show_inventory(ctx, user, filter_type.lower(), filter_value)
+            # Utiliser split("=") une seule fois pour séparer le type de filtre et la valeur du filtre
+            filter_parts = filter_arg.split("=")
+
+            # Le type de filtre est la première partie
+            filter_type = filter_parts[0].lower()
+
+            # La valeur du filtre est le reste de la chaîne, y compris les espaces
+            filter_value = "=".join(filter_parts[1:])
+
+            await self.show_inventory(ctx, user, filter_type, filter_value)
         else:
             await self.show_inventory(ctx, user, None, None)
 
