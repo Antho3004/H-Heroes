@@ -17,11 +17,11 @@ class Drop(commands.Cog):
 
         # Définir les pourcentages de drop en fonction de la rareté
         rarity_drop_rates = {
-            "C": 30,   # 40% pour les cartes communes (Common)
-            "U": 20,   # 30% pour les cartes peu communes (Uncommon)
-            "R": 0,   # 15% pour les cartes rares (Rare)
-            "E": 0,   # 10% pour les cartes épiques (Epic)
-            "L": 50     # 5% pour les cartes légendaires (Legendary)
+            "C": 40,   # 40% pour les cartes communes (Common)
+            "U": 30,   # 30% pour les cartes peu communes (Uncommon)
+            "R": 15,   # 15% pour les cartes rares (Rare)
+            "E": 10,   # 10% pour les cartes épiques (Epic)
+            "L": 5     # 5% pour les cartes légendaires (Legendary)
         }
 
         # Calculer le pourcentage total de drop (100%)
