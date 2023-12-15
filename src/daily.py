@@ -11,7 +11,7 @@ class Daily(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    #@commands.cooldown(1, 86400, commands.BucketType.user)
+    @commands.cooldown(1, 86400, commands.BucketType.user)
     async def daily(self, ctx):
         user_id = ctx.author.id
 
@@ -141,7 +141,7 @@ class Daily(commands.Cog):
             title = f"**DAILY REWARD - DROP**"
 
             # Crée le message à envoyer après avoir dropé la carte
-            drop_message = f"Congratulations {ctx.author.mention}\nYou have dropped: [{groupe} {card_name} - {rarity_emoji} ] n° {code_card.split('-')[1]}"
+            drop_message = f"Congratulations {ctx.author.mention}\nYou have dropped: [{groupe} {card_name} - {rarity_emoji} ] n° {code_card.split('-')[1]}\nCode : `{code_card}`"
 
             # Crée l'embed Discord avec le titre, le message et l'image de la carte
             embed = discord.Embed(title=title, description=drop_message)
