@@ -61,21 +61,31 @@ class Inventaire(commands.Cog):
                 embed = discord.Embed(title=f"{user.name}'s inventory", color=discord.Color.green())
 
                 for line in chunk:
-                    if line[4] and line[4].lower() == 'xmas 2023':
-                        rarity_emojis = {
-                            "U": "<:xmas_boot:1183911398661693631>",
-                            "L": "<:xmas_hat:1183911360808112160>"
-                        }
-                    else:
-                        rarity_emojis = {
-                            "C": "<:C_:1107771999490686987>",
-                            "U": "<:U_:1107772008193867867>",
-                            "R": "<:R_:1107772004410601553>",
-                            "E": "<:E_:1107772001747222550>",
-                            "L": "<:L_:1107772002690945055>"
-                        }
-                    embed.add_field(
-                        name=f"{line[0]}", value=f"Name: {line[1]}\nGroup: {line[2]}\nRarity: {rarity_emojis.get(line[3], '')}\n", inline=True)
+                        if line[4] and line[4].lower() == 'xmas 2023':
+                            rarity_emojis = {
+                                "U": "<:xmas_boot:1183911398661693631>",
+                                "L": "<:xmas_hat:1183911360808112160>"
+                            }
+                        else:
+                            rarity_emojis = {
+                                "C": "<:C_:1107771999490686987>",
+                                "U": "<:U_:1107772008193867867>",
+                                "R": "<:R_:1107772004410601553>",
+                                "E": "<:E_:1107772001747222550>",
+                                "L": "<:L_:1107772002690945055>"
+                            }
+
+                        card_name = f"{line[0]}"
+                        card_info = ""
+
+                        # Check if the event is present and not NULL
+                        if line[4] is not None:
+                            card_info += f"Event: {line[4]}\n"
+
+                        card_info += f"Name: {line[1]}\nGroup: {line[2]}\n"
+                        card_info += f"Rarity: {rarity_emojis.get(line[3], '')}\n"
+
+                        embed.add_field(name=card_name, value=card_info, inline=True)
 
                 embed.set_footer(text=f"Total cards: {count}")
                 embeds.append(embed)
