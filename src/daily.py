@@ -22,11 +22,11 @@ class Daily(commands.Cog):
             # Récompense de carte
             # Définir les pourcentages de drop en fonction de la rareté
             rarity_drop_rates = {
-                "C": 50,   # 30% pour les cartes communes (Common)
-                "U": 50,   # 25% pour les cartes peu communes (Uncommon)
-                #"R": 20,   # 20% pour les cartes rares (Rare)
-                #"E": 15,   # 15% pour les cartes épiques (Epic)
-                #"L": 10    # 10% pour les cartes légendaires (Legendary)
+                "C": 30,   # 30% pour les cartes communes (Common)
+                "U": 25,   # 25% pour les cartes peu communes (Uncommon)
+                "R": 20,   # 20% pour les cartes rares (Rare)
+                "E": 15,   # 15% pour les cartes épiques (Epic)
+                "L": 10    # 10% pour les cartes légendaires (Legendary)
             }
 
             # Calculer le pourcentage total de drop (100%)
@@ -49,14 +49,14 @@ class Daily(commands.Cog):
                 return
 
             # Requête pour obtenir une carte aléatoire de la rareté déterminée
-            cursor.execute("SELECT code_card, nom, groupe, version, image_url FROM cards WHERE rarete = ? ORDER BY RANDOM() LIMIT 1", (rarity,))
+            cursor.execute("SELECT code_card, nom, groupe, version, image_url, event FROM cards WHERE rarete = ? ORDER BY RANDOM() LIMIT 1", (rarity,))
             result = cursor.fetchone()
 
             if not result:
                 await ctx.send("Aucune carte n'est disponible.")
                 return
 
-            code_card, card_name, groupe, version, url_image = result
+            code_card, card_name, groupe, version, url_image, event = result
 
             # Incrémenter le numéro après le tiret
             code_card_parts = code_card.split("-")
@@ -120,20 +120,26 @@ class Daily(commands.Cog):
             else:
                 # Si la carte n'existe pas, l'ajouter à l'inventaire avec user_id à None
                 cursor.execute(
-                    "INSERT INTO user_inventaire (code_card, user_id, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (code_card, user_id, groupe, card_name, rarity, version, chant, dance, rap, acting, modeling, url_image)
+                    "INSERT INTO user_inventaire (code_card, user_id, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url, event) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (code_card, user_id, groupe, card_name, rarity, version, chant, dance, rap, acting, modeling, url_image, event)
                 )
                 connection.commit()
 
             # Get the corresponding rarity emoji
-            rarity_emojis = {
-                "C": "<:C_:1107771999490686987>",
-                "U": "<:U_:1107772008193867867>",
-                "R": "<:R_:1107772004410601553>",
-                "E": "<:E_:1107772001747222550>",
-                "L": "<:L_:1107772002690945055>"
-            }
+            if event and event.lower() == 'xmas 2023':
+                rarity_emojis = {
+                    "U": "<:xmas_boot:1183911398661693631>",
+                    "L": "<:xmas_hat:1183911360808112160>"
+                }
+            else:
+                rarity_emojis = {
+                    "C": "<:C_:1107771999490686987>",
+                    "U": "<:U_:1107772008193867867>",
+                    "R": "<:R_:1107772004410601553>",
+                    "E": "<:E_:1107772001747222550>",
+                    "L": "<:L_:1107772002690945055>"
+                }
 
             rarity_emoji = rarity_emojis.get(rarity, "")  # Get the emoji for the corresponding rarity or an empty string if not found
 
