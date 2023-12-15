@@ -11,7 +11,6 @@ class Inventaire(commands.Cog):
         self.bot = bot
 
     async def show_inventory(self, ctx, user, filter_type, filter_value):
-        
         # Convertir la valeur du filtre en minuscules
         filter_value = filter_value.lower() if filter_value else None
 
