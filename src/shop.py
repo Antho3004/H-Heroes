@@ -81,14 +81,20 @@ class Shop(commands.Cog):
                 await ctx.send(embed=embed)
     
     
-    def get_rarity_emoji(self, rarity):
-        rarity_emojis = {
-            "C": "<:C_:1107771999490686987>",
-            "U": "<:U_:1107772008193867867>",
-            "R": "<:R_:1107772004410601553>",
-            "E": "<:E_:1107772001747222550>",
-            "L": "<:L_:1107772002690945055>"
-        }
+    def get_rarity_emoji(self, rarity, event):
+        if event and event.lower() == 'xmas 2023':
+            rarity_emojis = {
+                "U": "<:xmas_boot:1183911398661693631>",
+                "L": "<:xmas_hat:1183911360808112160>"
+            }
+        else:
+            rarity_emojis = {
+                "C": "<:C_:1107771999490686987>",
+                "U": "<:U_:1107772008193867867>",
+                "R": "<:R_:1107772004410601553>",
+                "E": "<:E_:1107772001747222550>",
+                "L": "<:L_:1107772002690945055>"
+            }
         return rarity_emojis.get(rarity, "")
 
     @commands.command()
@@ -161,14 +167,14 @@ class Shop(commands.Cog):
                     await ctx.send(rarity)
                     return
 
-                cursor.execute("SELECT code_card, nom, groupe, version, image_url FROM cards WHERE rarete = ? ORDER BY RANDOM() LIMIT 1", (rarity,))
+                cursor.execute("SELECT code_card, nom, groupe, version, image_url, event FROM cards WHERE rarete = ? ORDER BY RANDOM() LIMIT 1", (rarity,))
                 result = cursor.fetchone()
 
                 if not result:
                     await ctx.send("Erreur car il n'y a pas la rarete dispo dans le jeu")
                     return
 
-                code_card, card_name, groupe, version, url_image = result
+                code_card, card_name, groupe, version, url_image, event = result
 
                 code_card_parts = code_card.split("-")
                 if len(code_card_parts) == 2:
@@ -226,9 +232,9 @@ class Shop(commands.Cog):
                     pass
                 else:
                     cursor.execute(
-                        "INSERT INTO user_inventaire (code_card, user_id, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url) "
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        (code_card, user_id, groupe, card_name, rarity, version, chant, dance, rap, acting, modeling, url_image)
+                        "INSERT INTO user_inventaire (code_card, user_id, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url, event) "
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (code_card, user_id, groupe, card_name, rarity, version, chant, dance, rap, acting, modeling, url_image, event)
                     )
                     connection.commit()
 
@@ -238,11 +244,12 @@ class Shop(commands.Cog):
                     "card_name": card_name,
                     "groupe": groupe,
                     "version": version,
-                    "url_image": url_image
+                    "url_image": url_image,
+                    "event" : event
                 })
 
             # Afficher les cartes obtenues dans le message
-            card_list_message = "\n".join([f"- {card['groupe']} {card['card_name']} {self.get_rarity_emoji(card['rarity'])} n° {card['code_card'].split('-')[1]} `{card['code_card']}`" for card in cards])
+            card_list_message = "\n".join([f"- {card['groupe']} {card['card_name']} {self.get_rarity_emoji(card['rarity'], event)} n° {card['code_card'].split('-')[1]} `{card['code_card']}`" for card in cards])
 
             # Créer l'embed Discord
             embed = discord.Embed(title="Opened Pack", description=f"Congratulations {ctx.author.mention}\nYou have opened a {pack_name} pack and obtained the following cards:\n{card_list_message}", color=discord.Color.green())
