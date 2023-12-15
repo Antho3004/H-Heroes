@@ -10,40 +10,47 @@ class Trade(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def gift(self, ctx, user: discord.Member = None, code_card: str = None):
+    async def gift(self, ctx, user: discord.Member = None, *code_cards: str):
         if user is None:
             user = ctx.author
 
-        if code_card is None:
-            embed = discord.Embed(description="Please provide a card code", color=discord.Color.red())
+        if not code_cards:
+            embed = discord.Embed(description="Please provide at least one card code", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
         author_id = ctx.author.id
-        cursor.execute("SELECT * FROM user_inventaire WHERE user_id = ? AND code_card = ?", (author_id, code_card))
-        card_data = cursor.fetchone()
+        given_cards = []
 
-        if card_data is None:
-            embed = discord.Embed(description="You don't have this card", color=discord.Color.red())
-            await ctx.send(embed=embed)
-            return
+        for code_card in code_cards:
+            cursor.execute("SELECT * FROM user_inventaire WHERE user_id = ? AND code_card = ?", (author_id, code_card))
+            card_data = cursor.fetchone()
 
-        # Vérifier si la carte se trouve dans le marché
-        cursor.execute("SELECT * FROM market WHERE code_card = ?", (code_card,))
-        market_card_data = cursor.fetchone()
+            if card_data is None:
+                embed = discord.Embed(description=f"You don't have the card `{code_card}`", color=discord.Color.red())
+                await ctx.send(embed=embed)
+                continue
 
-        if market_card_data is not None:
-            # Retirer la carte du marché
-            cursor.execute("DELETE FROM market WHERE code_card = ?", (code_card,))
+            # Vérifier si la carte se trouve dans le marché
+            cursor.execute("SELECT * FROM market WHERE code_card = ?", (code_card,))
+            market_card_data = cursor.fetchone()
+
+            if market_card_data is not None:
+                # Retirer la carte du marché
+                cursor.execute("DELETE FROM market WHERE code_card = ?", (code_card,))
+                connection.commit()
+
+            # Donner la carte à l'utilisateur mentionné
+            cursor.execute("UPDATE user_inventaire SET user_id = ? where code_card = ?", (user.id, code_card))
             connection.commit()
 
-        # Donner la carte à l'utilisateur mentionné
-        cursor.execute("UPDATE user_inventaire SET user_id = ? where code_card = ?", (user.id, code_card))
-        connection.commit()
+            given_cards.append(code_card)
 
-        embed = discord.Embed(description=f"You gave the card `{code_card}` to {user.mention}", color=discord.Color.green())
-        await ctx.send(embed=embed)
-    
+        if given_cards:
+            cards_str = ', '.join([f"`{card}`" for card in given_cards])
+            embed = discord.Embed(description=f"You gave the cards {cards_str} to {user.mention}", color=discord.Color.green())
+            await ctx.send(embed=embed)
+
     @commands.command()
     async def bal_give(self, ctx, user: discord.Member = None, amount: int = None):
         if user is None:
