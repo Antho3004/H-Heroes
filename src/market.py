@@ -20,7 +20,7 @@ class MarketPlace(commands.Cog):
             count = cursor.fetchone()[0]
 
             if count > 0:
-                cursor.execute("SELECT i.user_id, i.groupe, i.nom, i.rarete, m.code_card, m.prix FROM market m JOIN user_inventaire i ON m.code_card = i.code_card ORDER BY i.groupe, i.nom")
+                cursor.execute("SELECT i.user_id, i.groupe, i.nom, i.rarete, m.code_card, m.prix , i.event FROM market m JOIN user_inventaire i ON m.code_card = i.code_card ORDER BY i.groupe, i.nom")
                 result = cursor.fetchall()
 
                 rarity_emojis = {
@@ -42,6 +42,19 @@ class MarketPlace(commands.Cog):
                     for i in range(0, len(chunk), 3):
                         cards_in_line = chunk[i:i + 3]
                         for line in cards_in_line:
+                            if line[6] and line[6].lower() == 'xmas 2023':
+                                rarity_emojis = {
+                                    "U": "<:xmas_boot:1183911398661693631>",
+                                    "L": "<:xmas_hat:1183911360808112160>"
+                                }
+                            else:
+                                rarity_emojis = {
+                                    "C": "<:C_:1107771999490686987>",
+                                    "U": "<:U_:1107772008193867867>",
+                                    "R": "<:R_:1107772004410601553>",
+                                    "E": "<:E_:1107772001747222550>",
+                                    "L": "<:L_:1107772002690945055>"
+                                }
                             embed.add_field(
                                 name=f"{line[1]} - {line[2]} {rarity_emojis.get(line[3], '')}",
                                 value=f"{line[4]}\nPrice : {self.format_money(line[5])} <:HCoins:1134169003657547847>\n<@{line[0]}>",
@@ -64,16 +77,8 @@ class MarketPlace(commands.Cog):
             count = cursor.fetchone()[0]
 
             if count > 0:
-                cursor.execute("SELECT i.user_id, i.groupe, i.nom, i.rarete, m.code_card, m.prix FROM market m JOIN user_inventaire i ON m.code_card = i.code_card WHERE i.user_id = ? ORDER BY i.groupe, i.nom", (user.id,))
+                cursor.execute("SELECT i.user_id, i.groupe, i.nom, i.rarete, m.code_card, m.prix, i.event FROM market m JOIN user_inventaire i ON m.code_card = i.code_card WHERE i.user_id = ? ORDER BY i.groupe, i.nom", (user.id,))
                 result = cursor.fetchall()
-
-                rarity_emojis = {
-                    "C": "<:C_:1107771999490686987>",
-                    "U": "<:U_:1107772008193867867>",
-                    "R": "<:R_:1107772004410601553>",
-                    "E": "<:E_:1107772001747222550>",
-                    "L": "<:L_:1107772002690945055>"
-                }
 
                 # Divisez vos données en morceaux de 9 cartes par page
                 chunks = [result[i:i + 9] for i in range(0, len(result), 9)]
@@ -87,6 +92,19 @@ class MarketPlace(commands.Cog):
                         cards_in_line = chunk[i:i + 3]
 
                         for line in cards_in_line:
+                            if line[6] and line[6].lower() == 'xmas 2023':
+                                rarity_emojis = {
+                                    "U": "<:xmas_boot:1183911398661693631>",
+                                    "L": "<:xmas_hat:1183911360808112160>"
+                                }
+                            else:
+                                rarity_emojis = {
+                                    "C": "<:C_:1107771999490686987>",
+                                    "U": "<:U_:1107772008193867867>",
+                                    "R": "<:R_:1107772004410601553>",
+                                    "E": "<:E_:1107772001747222550>",
+                                    "L": "<:L_:1107772002690945055>"
+                                }
                             embed.add_field(
                                 name=f"{line[1]} - {line[2]} {rarity_emojis.get(line[3], '')}",
                                 value=f"{line[4]}\nPrice : {self.format_money(line[5])} <:HCoins:1134169003657547847>\n<@{line[0]}>",
