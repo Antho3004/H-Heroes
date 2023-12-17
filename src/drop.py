@@ -11,17 +11,17 @@ class Drop(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @commands.cooldown(1, 300, commands.BucketType.user)
+    #@commands.cooldown(1, 300, commands.BucketType.user)
     async def drop(self, ctx):
         user_id = ctx.author.id
 
         # Définir les pourcentages de drop en fonction de la rareté
         rarity_drop_rates = {
-            "C": 40,   # 40% pour les cartes communes (Common)
-            "U": 30,   # 30% pour les cartes peu communes (Uncommon)
-            "R": 15,   # 15% pour les cartes rares (Rare)
-            "E": 10,   # 10% pour les cartes épiques (Epic)
-            "L": 5     # 5% pour les cartes légendaires (Legendary)
+            "C": 0,   # 40% pour les cartes communes (Common)
+            "U": 0,   # 30% pour les cartes peu communes (Uncommon)
+            "R": 100,   # 15% pour les cartes rares (Rare)
+            "E": 0,   # 10% pour les cartes épiques (Epic)
+            "L": 0     # 5% pour les cartes légendaires (Legendary)
         }
 
         # Calculer le pourcentage total de drop (100%)
@@ -138,6 +138,11 @@ class Drop(commands.Cog):
                 rarity_emojis = {
                     "U": "<:xmas_boot:1183911398661693631>",
                     "L": "<:xmas_hat:1183911360808112160>"
+                }
+            elif event and event.lower() == 'new year 2024':
+                rarity_emojis = {
+                    "R": "<:NY_Confetti:1185996235551805470>",
+                    "L": "<:NY_Fireworks:1185996232477384808>"
                 }
             else:
                 rarity_emojis = {

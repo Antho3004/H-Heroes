@@ -9,6 +9,9 @@ class Trade(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    def format_money(self, money):
+        return "{:,}".format(money).replace(",", " ")
+
     @commands.command()
     async def gift(self, ctx, user: discord.Member = None, *code_cards: str):
         if user is None:
@@ -79,7 +82,11 @@ class Trade(commands.Cog):
         cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (amount, user.id))
         connection.commit()
 
-        embed = discord.Embed(description=f"You gave **{amount}** <:HCoins:1134169003657547847> to {user.mention}!", color=discord.Color.green())
+        cursor.execute("SELECT argent FROM user_data WHERE user_id = ?", (str(user.id),))
+        updated_amount = cursor.fetchone()[0]
+        uptated_formatted_amount = self.format_money(updated_amount)
+
+        embed = discord.Embed(description=f"You gave **{amount}** <:HCoins:1134169003657547847> to {user.mention}!\n\nTotal balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
         await ctx.send(embed=embed)
 
 async def setup(bot):

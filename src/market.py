@@ -23,14 +23,6 @@ class MarketPlace(commands.Cog):
                 cursor.execute("SELECT i.user_id, i.groupe, i.nom, i.rarete, m.code_card, m.prix , i.event FROM market m JOIN user_inventaire i ON m.code_card = i.code_card ORDER BY i.groupe, i.nom")
                 result = cursor.fetchall()
 
-                rarity_emojis = {
-                    "C": "<:C_:1107771999490686987>",
-                    "U": "<:U_:1107772008193867867>",
-                    "R": "<:R_:1107772004410601553>",
-                    "E": "<:E_:1107772001747222550>",
-                    "L": "<:L_:1107772002690945055>"
-                }
-
                 # Divisez vos données en morceaux de 9 cartes par page
                 chunks = [result[i:i + 9] for i in range(0, len(result), 9)]
 
@@ -46,6 +38,11 @@ class MarketPlace(commands.Cog):
                                 rarity_emojis = {
                                     "U": "<:xmas_boot:1183911398661693631>",
                                     "L": "<:xmas_hat:1183911360808112160>"
+                                }
+                            elif line[6] and line[6].lower() == 'new year 2024':
+                                rarity_emojis = {
+                                    "R": "<:NY_Confetti:1185996235551805470>",
+                                    "L": "<:NY_Fireworks:1185996232477384808>"
                                 }
                             else:
                                 rarity_emojis = {
@@ -132,7 +129,7 @@ class MarketPlace(commands.Cog):
             prix = int(prix)
         except ValueError:
             embed = discord.Embed(
-                title="Marketplace",
+                title=f"{user.name} - **Marketplace**",
                 description="Please enter a valid price.",
                 color=discord.Color.red()
             )
@@ -160,14 +157,14 @@ class MarketPlace(commands.Cog):
             formatted_argent = self.format_money(prix)
 
             embed = discord.Embed(
-                title="Marketplace",
+                title=f"{user.name} - **Marketplace**",
                 description=f"The card `{code_card}` is on sale for **{formatted_argent}** <:HCoins:1134169003657547847>",
                 color=discord.Color.green()
             )
             await ctx.send(embed=embed)
         else:
             embed = discord.Embed(
-                title="Vente",
+                title=f"{user.name} - **Marketplace**",
                 description=f"You do not have the card: `{code_card}`",
                 color=discord.Color.red()
             )
@@ -203,25 +200,30 @@ class MarketPlace(commands.Cog):
                     cursor.execute("DELETE FROM market WHERE code_card = ?", (code_card,))
                     connection.commit()
 
+                    cursor.execute("SELECT argent FROM user_data WHERE user_id = ?", (str(user.id),))
+                    updated_amount = cursor.fetchone()[0]
+                    uptated_formatted_amount = self.format_money(updated_amount)
+                    
+
                     formatted_argent = self.format_money(card_price)
 
-                    embed = discord.Embed(
-                        description=f"You have purchased the **{code_card}** for **{formatted_argent}** <:HCoins:1134169003657547847>", color=discord.Color.green()
+                    embed = discord.Embed(title=f"{user.name} - **Purchase**",
+                        description=f"You have purchased the **{code_card}** for **{formatted_argent}** <:HCoins:1134169003657547847>\n\nTotal balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green()
                     )
                     await ctx.send(embed=embed)
                 else:
-                    embed = discord.Embed(description="Sorry, you don't have enough <:HCoins:1134169003657547847> to buy this card.",
+                    embed = discord.Embed(title=f"{user.name} - **Purchase**", description="Sorry, you don't have enough <:HCoins:1134169003657547847> to buy this card.",
                         color=discord.Color.red()
                     )
                     await ctx.send(embed=embed)
             else:
                 # The user doesn't have a balance entry, meaning they don't have any money
-                embed = discord.Embed(description="Sorry, you don't have enough <:HCoins:1134169003657547847> to buy this card.",
+                embed = discord.Embed(title=f"{user.name} - **Purchase**", description="Sorry, you don't have enough <:HCoins:1134169003657547847> to buy this card.",
                     color=discord.Color.red()
                 )
                 await ctx.send(embed=embed)
         else:
-            embed = discord.Embed(
+            embed = discord.Embed(title=f"{user.name} - **Market**",
                 description="Sorry, this card is not available in this marketplace.",
                 color=discord.Color.red()
             )

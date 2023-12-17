@@ -26,6 +26,9 @@ def has_favorite_card():
 class Work(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+    
+    def format_money(self, money):
+        return "{:,}".format(money).replace(",", " ")
 
     @commands.command()
     @has_favorite_card()  # Apply the custom check decorator
@@ -48,10 +51,16 @@ class Work(commands.Cog):
         elif carte_rarete == "L":
             montant = random.randint(400, 500)
 
+        # Update user's money in the database
         cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (montant, str(user.id)))
         connection.commit()
 
-        embed = discord.Embed(title=f"{user.name} - **WORK**", description=f"You have earned **{montant}** <:HCoins:1134169003657547847> from your last job!", color=discord.Color.green())
+        # Fetch the updated amount after the update
+        cursor.execute("SELECT argent FROM user_data WHERE user_id = ?", (str(user.id),))
+        updated_amount = cursor.fetchone()[0]
+        uptated_formatted_amount = self.format_money(updated_amount)
+
+        embed = discord.Embed(title=f"{user.name} - **WORK**", description=f"You have earned **{montant}** <:HCoins:1134169003657547847> from your last job!\n\nTotal balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
         await ctx.send(embed=embed)
 
 async def setup(bot):

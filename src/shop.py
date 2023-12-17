@@ -87,6 +87,11 @@ class Shop(commands.Cog):
                 "U": "<:xmas_boot:1183911398661693631>",
                 "L": "<:xmas_hat:1183911360808112160>"
             }
+        elif event and event.lower() == 'new year 2024':
+            rarity_emojis = {
+                "R": "<:NY_Confetti:1185996235551805470>",
+                "L": "<:NY_Fireworks:1185996232477384808>"
+            }
         else:
             rarity_emojis = {
                 "C": "<:C_:1107771999490686987>",

@@ -9,9 +9,12 @@ cursor = connection.cursor()
 class Daily(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+    
+    def format_money(self, money):
+        return "{:,}".format(money).replace(",", " ")
 
     @commands.command()
-    @commands.cooldown(1, 86400, commands.BucketType.user)
+    #@commands.cooldown(1, 86400, commands.BucketType.user)
     async def daily(self, ctx):
         user_id = ctx.author.id
 
@@ -132,6 +135,11 @@ class Daily(commands.Cog):
                     "U": "<:xmas_boot:1183911398661693631>",
                     "L": "<:xmas_hat:1183911360808112160>"
                 }
+            elif event and event.lower() == 'new year 2024':
+                rarity_emojis = {
+                    "R": "<:NY_Confetti:1185996235551805470>",
+                    "L": "<:NY_Fireworks:1185996232477384808>"
+                }
             else:
                 rarity_emojis = {
                     "C": "<:C_:1107771999490686987>",
@@ -169,11 +177,15 @@ class Daily(commands.Cog):
 
             connection.commit()
 
+            cursor.execute("SELECT argent FROM user_data WHERE user_id = ?", (str(user_id),))
+            updated_amount = cursor.fetchone()[0]
+            uptated_formatted_amount = self.format_money(updated_amount)
+
             # Crée le titre de l'embed
             title = f"**DAILY REWARD - WORK**"
 
             # Crée le message à envoyer après avoir gagné de l'argent
-            drop_message = f"Congratulations {ctx.author.mention}\nYou have received a daily reward of {montant} <:HCoins:1134169003657547847>!"
+            drop_message = f"Congratulations {ctx.author.mention}\nYou have received a daily reward of {montant} <:HCoins:1134169003657547847>!\n\nTotal balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>"
 
             # Crée l'embed Discord avec le titre et le message
             embed = discord.Embed(title=title, description=drop_message, color=discord.Color.green())
