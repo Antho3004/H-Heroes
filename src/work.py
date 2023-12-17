@@ -60,7 +60,7 @@ class Work(commands.Cog):
         updated_amount = cursor.fetchone()[0]
         uptated_formatted_amount = self.format_money(updated_amount)
 
-        embed = discord.Embed(title=f"{user.name} - **WORK**", description=f"You have earned **{montant}** <:HCoins:1134169003657547847> from your last job!\n\nTotal balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
+        embed = discord.Embed(title=f"{user.name} - **WORK**", description=f"You have earned **{montant}** <:HCoins:1134169003657547847> from your last job!\n\nNew balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
         await ctx.send(embed=embed)
 
 async def setup(bot):

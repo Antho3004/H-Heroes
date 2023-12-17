@@ -6,6 +6,9 @@ import random
 class Shop(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+    
+    def format_money(self, money):
+        return "{:,}".format(money).replace(",", " ")
 
     @commands.command()
     async def shop(self, ctx):
@@ -71,7 +74,11 @@ class Shop(commands.Cog):
                     cursor.execute("UPDATE user_data SET argent = ?, bronze = ?, silver = ?, gold = ?, legendary = ? WHERE user_id = ?", (new_money, bronze_packs, silver_packs, gold_packs, legendary_packs, user_id))
                     connection.commit()
 
-                    embed = discord.Embed(title="Purchase Successful", description=f"You have purchased the pack {pack_name}!", color=discord.Color.green())
+                    cursor.execute("SELECT argent FROM user_data WHERE user_id = ?", (str(user_id),))
+                    updated_amount = cursor.fetchone()[0]
+                    uptated_formatted_amount = self.format_money(updated_amount)
+
+                    embed = discord.Embed(title="Purchase Successful", description=f"You have purchased the pack {pack_name} !\n\nNew balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
                     await ctx.send(embed=embed)
                 else:
                     embed = discord.Embed(title="Insufficient Funds", description="You don't have enough money to buy this pack.", color=discord.Color.red())

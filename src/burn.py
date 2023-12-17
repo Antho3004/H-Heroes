@@ -69,7 +69,7 @@ class Burn(commands.Cog):
 
         if not error_occurred:  # Exécuter seulement si aucune erreur ne s'est produite
             # Confirmation message in an embed with the total money reward
-            embed = Embed(title="Cards Burned Successfully", description=f"You burned **{len(codes_cards)}** cards and gained a total of **{total_money_reward}** <:HCoins:1134169003657547847>\n\nTotal balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
+            embed = Embed(title="Cards Burned Successfully", description=f"You burned **{len(codes_cards)}** cards and gained a total of **{total_money_reward}** <:HCoins:1134169003657547847>\n\nNew balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
             await ctx.send(embed=embed)
 
 async def setup(bot):

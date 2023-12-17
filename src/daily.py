@@ -185,7 +185,7 @@ class Daily(commands.Cog):
             title = f"**DAILY REWARD - WORK**"
 
             # Crée le message à envoyer après avoir gagné de l'argent
-            drop_message = f"Congratulations {ctx.author.mention}\nYou have received a daily reward of {montant} <:HCoins:1134169003657547847>!\n\nTotal balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>"
+            drop_message = f"Congratulations {ctx.author.mention}\nYou have received a daily reward of {montant} <:HCoins:1134169003657547847>!\n\nNew balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>"
 
             # Crée l'embed Discord avec le titre et le message
             embed = discord.Embed(title=title, description=drop_message, color=discord.Color.green())

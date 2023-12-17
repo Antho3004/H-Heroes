@@ -208,7 +208,7 @@ class MarketPlace(commands.Cog):
                     formatted_argent = self.format_money(card_price)
 
                     embed = discord.Embed(title=f"{user.name} - **Purchase**",
-                        description=f"You have purchased the **{code_card}** for **{formatted_argent}** <:HCoins:1134169003657547847>\n\nTotal balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green()
+                        description=f"You have purchased the **{code_card}** for **{formatted_argent}** <:HCoins:1134169003657547847>\n\nNew balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green()
                     )
                     await ctx.send(embed=embed)
                 else:
