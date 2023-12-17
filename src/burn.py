@@ -10,6 +10,9 @@ cursor = connection.cursor()
 class Burn(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+    
+    def format_money(self, money):
+        return "{:,}".format(money).replace(",", " ")
 
     @commands.command()
     async def burn(self, ctx, *codes_cards: str):
@@ -60,9 +63,13 @@ class Burn(commands.Cog):
 
         connection.commit()
 
+        cursor.execute("SELECT argent FROM user_data WHERE user_id = ?", (str(user_id),))
+        updated_amount = cursor.fetchone()[0]
+        uptated_formatted_amount = self.format_money(updated_amount)
+
         if not error_occurred:  # Exécuter seulement si aucune erreur ne s'est produite
             # Confirmation message in an embed with the total money reward
-            embed = Embed(title="Cards Burned Successfully", description=f"You burned **{len(codes_cards)}** cards and gained a total of **{total_money_reward}** <:HCoins:1134169003657547847>", color=discord.Color.green())
+            embed = Embed(title="Cards Burned Successfully", description=f"You burned **{len(codes_cards)}** cards and gained a total of **{total_money_reward}** <:HCoins:1134169003657547847>\n\nTotal balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
             await ctx.send(embed=embed)
 
 async def setup(bot):
