@@ -14,7 +14,7 @@ class Daily(commands.Cog):
         return "{:,}".format(money).replace(",", " ")
 
     @commands.command()
-    #@commands.cooldown(1, 86400, commands.BucketType.user)
+    @commands.cooldown(1, 86400, commands.BucketType.user)
     async def daily(self, ctx):
         user_id = ctx.author.id
 
