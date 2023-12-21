@@ -89,17 +89,20 @@ class Shop(commands.Cog):
     
     
     def get_rarity_emoji(self, rarity, event):
-        if event and event.lower() == 'xmas 2023':
-            rarity_emojis = {
-                "U": "<:xmas_boot:1183911398661693631>",
-                "L": "<:xmas_hat:1183911360808112160>"
-            }
-        elif event and event.lower() == 'new year 2024':
-            rarity_emojis = {
-                "R": "<:NY_Confetti:1185996235551805470>",
-                "L": "<:NY_Fireworks:1185996232477384808>"
-            }
+        if event is not None:
+            event_lower = str(event).lower()
+            if event_lower == 'xmas 2023':
+                rarity_emojis = {
+                    "U": "<:xmas_boot:1183911398661693631>",
+                    "L": "<:xmas_hat:1183911360808112160>"
+                }
+            elif event_lower == 'new year 2024':
+                rarity_emojis = {
+                    "R": "<:NY_Confetti:1185996235551805470>",
+                    "L": "<:NY_Fireworks:1185996232477384808>"
+                }
         else:
+            # Aucun événement, utilisez les emojis génériques
             rarity_emojis = {
                 "C": "<:C_:1107771999490686987>",
                 "U": "<:U_:1107772008193867867>",
@@ -107,7 +110,9 @@ class Shop(commands.Cog):
                 "E": "<:E_:1107772001747222550>",
                 "L": "<:L_:1107772002690945055>"
             }
+
         return rarity_emojis.get(rarity, "")
+
 
     @commands.command()
     async def open_pack(self, ctx, pack_name: str):
@@ -142,8 +147,8 @@ class Shop(commands.Cog):
             if pack_name_lower == "bronze":
                 rarity_drop_rates = {
                     "C": 50,
-                    "U": 30,
-                    "R": 20
+                    "U": 40,
+                    "R": 10
                 }
             elif pack_name_lower == "silver":
                 rarity_drop_rates = {
@@ -261,7 +266,15 @@ class Shop(commands.Cog):
                 })
 
             # Afficher les cartes obtenues dans le message
-            card_list_message = "\n".join([f"- {card['groupe']} {card['card_name']} {self.get_rarity_emoji(card['rarity'], event)} n° {card['code_card'].split('-')[1]} `{card['code_card']}`" for card in cards])
+            card_list_messages = []
+            for card in cards:
+                rarity_emoji = self.get_rarity_emoji(card['rarity'], card['event'])
+                card_list_messages.append(
+                    f"- {card['groupe']} {card['card_name']} {rarity_emoji} n° {card['code_card'].split('-')[1]} `{card['code_card']}`"
+                )
+
+            card_list_message = "\n".join(card_list_messages)
+
 
             # Créer l'embed Discord
             embed = discord.Embed(title="Opened Pack", description=f"Congratulations {ctx.author.mention}\nYou have opened a {pack_name} pack and obtained the following cards:\n{card_list_message}", color=discord.Color.green())
