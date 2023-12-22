@@ -22,7 +22,7 @@ class View(commands.Cog):
             return
 
         # Extraire les informations de la carte
-        user_id, _, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url, event = card_data
+        user_id, _, groupe, nom, rarete, version, chant, dance, rap, acting, modeling, image_url, event, lock = card_data
 
         # Créer l'embed pour afficher les détails de la carte
         embed = discord.Embed(title="CARD'S DETAILS", description=f"**CODE** : {code_card}\n**NAME** : {nom}\n**GROUP** : {groupe}\n**VERSION** : {version}\n**OWNER** : <@{user_id}>\n" ,color=discord.Color.blue())

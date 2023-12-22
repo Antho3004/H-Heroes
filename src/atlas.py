@@ -47,8 +47,6 @@ class Atlas(commands.Cog):
 
             result = cursor.fetchall()
 
-            print(result)
-
             if not result:
                 # Aucun résultat trouvé avec le filtre spécifié
                 embed = discord.Embed(title=f"Atlas", description=f"Atlas is empty.", color=discord.Color.red())
