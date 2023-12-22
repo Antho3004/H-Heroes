@@ -6,7 +6,7 @@ import database
 
 class Bot(commands.Bot):
     def __init__(self) -> None:
-        super().__init__(command_prefix=";", intents=discord.Intents.all())
+        super().__init__(command_prefix="$", intents=discord.Intents.all())
 
     async def setup_hook(self) -> None:
         await self.load_extension("start")
@@ -25,6 +25,8 @@ class Bot(commands.Bot):
         await self.load_extension("shop")
         await self.load_extension("daily")
         await self.load_extension("cooldown")
+        await self.load_extension("lock")
+        await self.load_extension("atlas")
         #await self.load_extension("fuse")
         await self.tree.sync()
         database.table_users()

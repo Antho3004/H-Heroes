@@ -22,6 +22,7 @@ class Cooldown(commands.Cog):
         embed.add_field(name="", value=f"<:hclock2:1136747860478664765> **Drop** : {'✅' if drop_cooldown == 0 else drop_time}", inline=False)
         embed.add_field(name="", value=f"<:hclock2:1136747860478664765> **Work** : {'✅' if work_cooldown == 0 else work_time}", inline=False)
         embed.add_field(name="", value=f"<:hclock2:1136747860478664765> **Daily** : {'✅' if daily_cooldown == 0 else daily_time}", inline=False)
+        embed.add_field(name="", value=f"<:hclock2:1136747860478664765> **Battle** : Soon", inline=False)
 
         await ctx.send(embed=embed)
 

@@ -41,6 +41,16 @@ class Burn(commands.Cog):
                 error_occurred = True  # Une erreur s'est produite
                 continue  # Move to the next card in case of error
 
+            # Check if the card is in the user_inventaire with lock "True"
+            cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ?", (code_card,))
+            lock = cursor.fetchone()
+
+            if lock[13] == True:
+                embed = Embed(title="Card Burning Error", description=f"error, the card `{code_card}` is blocked. You must unlock it before burning it.", color=discord.Color.red())
+                await ctx.send(embed=embed)
+                error_occurred = True  # Une erreur s'est produite
+                continue  # Move to the next card in case of error
+
             # Get the amount of money to add (for example, 50 to illustrate, you can adjust this)
             carte_rarete = existing_card[4]
             if carte_rarete == "C":
