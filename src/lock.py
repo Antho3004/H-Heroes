@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord import Embed
 import sqlite3
+from dispie import Paginator
 
 connection = sqlite3.connect("HallyuHeroes.db")
 cursor = connection.cursor()
@@ -89,39 +90,43 @@ class Lock(commands.Cog):
         cursor.execute("SELECT * FROM user_inventaire WHERE lock = ? AND user_id = ? ORDER BY groupe, nom, rarete", (True, ctx.author.id))
         locked_cards_data = cursor.fetchall()
 
+        cursor.execute("SELECT COUNT(*) FROM user_inventaire WHERE lock = ? AND user_id = ?", (True, ctx.author.id))
+        count = cursor.fetchone()[0]
+
         if locked_cards_data:
+            chunks = [locked_cards_data[i:i + 15] for i in range(0, len(locked_cards_data), 15)]
             locked_cards_list = []
-            for card in locked_cards_data:
-                card_code = card[1]
-                card_name = card[3]
-                card_group = card[2] 
-                if card[12] and card[12].lower() == 'xmas 2023':
-                    rarity_emojis = {
-                        "U": "<:xmas_boot:1183911398661693631>",
-                        "L": "<:xmas_hat:1183911360808112160>"
-                    }
-                elif card[12] and card[12].lower() == 'new year 2024':
-                    rarity_emojis = {
-                        "R": "<:NY_Confetti:1185996235551805470>",
-                        "L": "<:NY_Fireworks:1185996232477384808>"
-                    }
-                else:
-                    rarity_emojis = {
-                        "C": "<:C_:1107771999490686987>",
-                        "U": "<:U_:1107772008193867867>",
-                        "R": "<:R_:1107772004410601553>",
-                        "E": "<:E_:1107772001747222550>",
-                        "L": "<:L_:1107772002690945055>"
-                    }
+            for chunk in chunks:
+                embed = discord.Embed(title=f"Atlas", color=discord.Color.green())
 
-                # Accéder à la clé correcte du dictionnaire pour obtenir l'emoji de rareté
-                rarity_emoji = rarity_emojis.get(card[4])
+                for line in chunk:
+                    if line[12] and line[12].lower() == 'xmas 2023':
+                        rarity_emojis = {
+                            "U": "<:xmas_boot:1183911398661693631>",
+                            "L": "<:xmas_hat:1183911360808112160>"
+                        }
+                    elif line[12] and line[12].lower() == 'new year 2024':
+                        rarity_emojis = {
+                            "R": "<:NY_Confetti:1185996235551805470>",
+                            "L": "<:NY_Fireworks:1185996232477384808>"
+                        }
+                    else:
+                        rarity_emojis = {
+                            "C": "<:C_:1107771999490686987>",
+                            "U": "<:U_:1107772008193867867>",
+                            "R": "<:R_:1107772004410601553>",
+                            "E": "<:E_:1107772001747222550>",
+                            "L": "<:L_:1107772002690945055>"
+                        }
+                                    # Accéder à la clé correcte du dictionnaire pour obtenir l'emoji de rareté
+                    card_name = f"- {line[2]} {line[3]} {rarity_emojis.get(line[4], '')} : `{line[1]}`"
+                    embed.add_field(name="", value=card_name, inline=False)
+                
+                embed.set_footer(text=f"Total cards: {count}")
+                locked_cards_list.append(embed)
 
-                locked_cards_list.append(f"- {card_group} {card_name} {rarity_emoji} : `{card_code}`")
-
-            locked_cards_message = "\n".join(locked_cards_list)
-            embed_locked_cards = Embed(title="Locked cards", description=locked_cards_message, color=discord.Color.blue())
-            await ctx.send(embed=embed_locked_cards)
+            paginator = Paginator(locked_cards_list)
+            await paginator.start(ctx)
         else:
             embed_no_locked_cards = Embed(title="Locked cards", description="No card is currently locked.", color=discord.Color.blue())
             await ctx.send(embed=embed_no_locked_cards)
