@@ -97,7 +97,7 @@ class Lock(commands.Cog):
             chunks = [locked_cards_data[i:i + 15] for i in range(0, len(locked_cards_data), 15)]
             locked_cards_list = []
             for chunk in chunks:
-                embed = discord.Embed(title=f"Atlas", color=discord.Color.green())
+                embed = discord.Embed(title=f"Locked cards", color=discord.Color.green())
 
                 for line in chunk:
                     if line[12] and line[12].lower() == 'xmas 2023':
