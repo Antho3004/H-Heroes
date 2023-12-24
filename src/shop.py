@@ -6,6 +6,11 @@ import random
 class Shop(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.allowed_users = {307595556325425174, 403661101385908225}  # Ajoutez les ID des utilisateurs autorisés ici
+
+    def is_allowed_user(self, ctx):
+        # Votre logique pour vérifier si l'utilisateur est autorisé
+        return ctx.author.id in self.allowed_users
     
     def format_money(self, money):
         return "{:,}".format(money).replace(",", " ")
@@ -167,8 +172,20 @@ class Shop(commands.Cog):
                     "L": 100
                 }
 
+            # Déterminer le montant de la compensation en fonction de la rareté du pack
+            compensation_rates = {
+                "bronze": 3000,
+                "silver": 7000,
+                "gold": 20000,
+                "legendary": 50000
+            }
+
+            compensation_amount = compensation_rates.get(pack_name_lower, 0)
+
             # Générer 5 cartes aléatoires comme dans la fonction drop
             cards = []
+            cards_generated = 0  # Ajout de la variable pour suivre le nombre de cartes générées
+
             for _ in range(5):
                 total_drop_rate = sum(rarity_drop_rates.values())
                 drop_chance = random.randint(1, total_drop_rate + 1)
@@ -183,12 +200,14 @@ class Shop(commands.Cog):
                 if not rarity:
                     await ctx.send(rarity)
                     return
+                else:
+                    cards_generated += 1  # Incrémenter le nombre de cartes générées
 
                 cursor.execute("SELECT code_card, nom, groupe, version, image_url, event FROM cards WHERE rarete = ? ORDER BY RANDOM() LIMIT 1", (rarity,))
                 result = cursor.fetchone()
 
                 if not result:
-                    await ctx.send("Erreur car il n'y a pas la rarete dispo dans le jeu")
+                    await ctx.send("Erreur car il n'y a pas la rareté dispo dans le jeu")
                     return
 
                 code_card, card_name, groupe, version, url_image, event = result
@@ -265,6 +284,12 @@ class Shop(commands.Cog):
                     "event" : event
                 })
 
+            # Vérifier si le nombre de cartes générées est inférieur à 5 et ajouter une compensation en argent
+            if cards_generated < 5:
+                cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (compensation_amount, user_id))
+                connection.commit()
+                await ctx.send(f"Due to a bug, you have been compensated with **{compensation_amount}** <:HCoins:1134169003657547847>")
+
             # Afficher les cartes obtenues dans le message
             card_list_messages = []
             for card in cards:
@@ -275,12 +300,34 @@ class Shop(commands.Cog):
 
             card_list_message = "\n".join(card_list_messages)
 
-
             # Créer l'embed Discord
             embed = discord.Embed(title="Opened Pack", description=f"Congratulations {ctx.author.mention}\nYou have opened a {pack_name} pack and obtained the following cards:\n{card_list_message}", color=discord.Color.green())
 
             # Envoyer l'embed
             await ctx.send(embed=embed)
+    
+    @commands.command()
+    async def add_pack(self, ctx, user: discord.User, pack_rarity: str, amount: int = 1):
+        # Vérifier si l'utilisateur est autorisé
+        if not self.is_allowed_user(ctx):
+            embed = discord.Embed(title="Unauthorized", description="You are not authorized to use this command.", color=discord.Color.red())
+            await ctx.send(embed=embed)
+            return
+
+        # Vérifier si la rareté du pack est valide
+        if pack_rarity.lower() not in ["bronze", "silver", "gold", "legendary"]:
+            embed = discord.Embed(title="Invalid Rarity", description="Invalid pack rarity. Available rarities: bronze, silver, gold, legendary", color=discord.Color.red())
+            await ctx.send(embed=embed)
+            return
+
+        # Ajouter le pack à l'inventaire de l'utilisateur spécifié
+        with sqlite3.connect("HallyuHeroes.db") as connection:
+            cursor = connection.cursor()
+            cursor.execute(f"UPDATE user_data SET {pack_rarity.lower()} = {pack_rarity.lower()} + ? WHERE user_id = ?", (amount, user.id))
+            connection.commit()
+
+        embed = discord.Embed(title="Pack Added", description=f"{amount} {pack_rarity} pack{'s' if amount > 1 else ''} has been added to {user.mention}'s inventory.", color=discord.Color.green())
+        await ctx.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Shop(bot))
