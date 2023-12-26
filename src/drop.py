@@ -25,7 +25,7 @@ class Drop(commands.Cog):
             }  
 
     @commands.command()
-    @commands.cooldown(1, 300, commands.BucketType.user)
+    #@commands.cooldown(1, 300, commands.BucketType.user)
     async def drop(self, ctx):
         user_id = ctx.author.id
 
@@ -189,7 +189,8 @@ class Drop(commands.Cog):
                 if card_name.lower() in favorite_cards.lower():
                     players_with_favorite_card.append(player_id)
                     # Donner le bonus d'argent au joueur qui a dropé la carte préférée
-                    cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (bonus_amount, player_id))
+                    print(player_id)
+                    cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (bonus_amount, user_id))
                     connection.commit()
 
             # Envoyer un message au joueur qui a dropé la carte préférée
