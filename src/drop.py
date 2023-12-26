@@ -186,7 +186,7 @@ class Drop(commands.Cog):
             players_with_favorite_card = []
             bonus_amount = 5000
             for player_id, favorite_cards in self.cartes_preferees.items():
-                if card_name in favorite_cards:
+                if card_name.lower() in favorite_cards.lower():
                     players_with_favorite_card.append(player_id)
                     # Donner le bonus d'argent au joueur qui a dropé la carte préférée
                     cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (bonus_amount, player_id))
@@ -197,7 +197,7 @@ class Drop(commands.Cog):
                 players_mentions = ", ".join([f"<@{player_id}>" for player_id in players_with_favorite_card])
                 embed_bonus = discord.Embed(
                     title="**Bonus**",
-                    description=f"Congratulations {ctx.author.mention}\nYou received a bonus of **{bonus_amount}** <:HCoins:1134169003657547847> for dropping the favorite card of {players_mentions}.",
+                    description=f"Congratulations {ctx.author.mention}\nYou received a bonus of **{bonus_amount}** <:HCoins:1134169003657547847> for dropping the UB of {players_mentions}.",
                     color=discord.Color.gold()
                 )
                 await ctx.send(embed=embed_bonus)
