@@ -11,17 +11,17 @@ class Daily(commands.Cog):
         self.bot = bot
     
         self.cartes_preferees = {
-            307595556325425174: ["Kim Lip", "Nana", "B.I"],  # Antho
-            403661101385908225: ["Lisa", "Minnie", "Jackson Wang", "Jackson"],  # Royal
-            820035016242757653: ["Chanyeol", "Suho", "Woosung"],  # Kelly
-            154322614515531776: ["Yena", "ChungHa", "Momo"],  # Zmix
-            757723242763911300: ["Kazuha", "Julie", "Xiaoting"],  # Koro
-            297758951230144513: ["Chaewon", "Winter", "Haerin"],  # Vision
-            396221256715862026: ["Gahyeon", "Suzy", "Bona"],  # Rayleigh
-            906220412919246898: ["Sana", "Sumin", "Jihyo"],  # Roswel
-            304193355141873666: ["Hani", "Siwon", "Max Changmin"],  # Walpole
-            929379626558586910: ["Hui", "Mingi", "Yeosang"],  # Unnilie
-            254635682184560641: ["Ryujin", "Winter", "Taemin"] # Osi
+            307595556325425174: [("Kim Lip", "LOONA"), ("Kim Lip", "ARTMS"), ("Nana", "EL7Z UP"), ("B.I", "SOLOISTS")],  #Antho
+            403661101385908225: [("Lisa", "BLACKPINK"), ("Lisa", "SOLOISTS"), ("Minnie", "(G)I-DLE"), ("Jackson", "GOT7"), ("Jackson Wang", "SOLOISTS")], #Royal
+            820035016242757653: [("Chanyeol", "EXO"), ("Chanyeol", "SOLOISTS "), ("Suho", "EXO"), ("Suho", "SOLOISTS "), ("Woosung", "The Rose"), ("Woosung", "SOLOISTS")],#Kelly
+            154322614515531776: [("Yena", "IZ*ONE"), ("Yena", "SOLOISTS"), ("Chungha", "SOLOISTS"), ("Momo", "TWICE"), ("Momo", "MISAMO")], # Zmix
+            757723242763911300: [("Kazuha", "Le sserafim"), ("Julie", "Kiss of life"), ("Xiaoting", "Kep1er")], # Koro
+            297758951230144513: [("Chaewon", "Le sserafim"), ("Chaewon", "IZ*ONE"), ("Bae", "NMIXX"), ("Haerin", "Newjeans")], # Vision
+            396221256715862026: [("Gahyeon", "Dreamcatcher"), ("Suzy", "MissA"), ("Suzy", "SOLOISTS"), ("Bona", "WJSN"), ("Bona", "WJSN The Black")], # Rayleigh
+            906220412919246898: [("Sana", "Twice"), ("Sana", "MISAMO"), ("Sumin", "STAYC"), ("Jihyo", "TWICE")], # Roswel
+            304193355141873666: [("Hani", "EXID"), ("Siwon", "Super Junior"), ("Max Changmin", "TVXQ "), ("Max Changmin", "SOLOISTS")], # Walpole
+            929379626558586910: [("Hui", "Pentagon"), ("Mingi", "Ateez"), ("Yeosang", "Ateez")], # Unnilie
+            254635682184560641: [("Winter", "aespa"), ("Winter", "GIRLS ON TOP"), ("Ryujin", "Itzy"), ("Taemin", "Shinee"), ("Taemin", "SOLOISTS")] # Osi
             }  
     
     def format_money(self, money):
@@ -182,11 +182,13 @@ class Daily(commands.Cog):
             players_with_favorite_card = []
             bonus_amount = 1000
             for player_id, favorite_cards in self.cartes_preferees.items():
-                if card_name in favorite_cards:
-                    players_with_favorite_card.append(player_id)
-                    # Donner le bonus d'argent au joueur qui a dropé la carte préférée
-                    cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (bonus_amount, user_id))
-                    connection.commit()
+                for fav_name, fav_group in favorite_cards:
+                    if card_name.lower() == fav_name.lower() and groupe.lower() == fav_group.lower():
+                        players_with_favorite_card.append(player_id)
+                        # Donner le bonus d'argent au joueur qui a dropé la carte préférée
+                        cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (bonus_amount, user_id))
+                        connection.commit()
+                        break 
 
             # Envoyer un message au joueur qui a dropé la carte préférée
             if players_with_favorite_card:
