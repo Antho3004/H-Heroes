@@ -10,6 +10,20 @@ class Daily(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
+        self.cartes_preferees = {
+            307595556325425174: ["Kim Lip", "Nana", "B.I"],  # Antho
+            403661101385908225: ["Lisa", "Minnie", "Jackson Wang", "Jackson"],  # Royal
+            820035016242757653: ["Chanyeol", "Suho", "Woosung"],  # Kelly
+            154322614515531776: ["Yena", "ChungHa", "Momo"],  # Zmix
+            757723242763911300: ["Kazuha", "Julie", "Xiaoting"],  # Koro
+            297758951230144513: ["Chaewon", "Winter", "Haerin"],  # Vision
+            396221256715862026: ["Gahyeon", "Suzy", "Bona"],  # Rayleigh
+            906220412919246898: ["Sana", "Sumin", "Jihyo"],  # Roswel
+            304193355141873666: ["Hani", "Siwon", "Max Changmin"],  # Walpole
+            929379626558586910: ["Hui", "Mingi", "Yeosang"],  # Unnilie
+            254635682184560641: ["Ryujin", "Winter", "Taemin"] # Osi
+            }  
+    
     def format_money(self, money):
         return "{:,}".format(money).replace(",", " ")
 
@@ -163,6 +177,26 @@ class Daily(commands.Cog):
 
             # Envoie l'embed
             await ctx.send(embed=embed)
+
+            # Vérifier si la carte dropée est la carte préférée d'un joueur
+            players_with_favorite_card = []
+            bonus_amount = 1000
+            for player_id, favorite_cards in self.cartes_preferees.items():
+                if card_name in favorite_cards:
+                    players_with_favorite_card.append(player_id)
+                    # Donner le bonus d'argent au joueur qui a dropé la carte préférée
+                    cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (bonus_amount, user_id))
+                    connection.commit()
+
+            # Envoyer un message au joueur qui a dropé la carte préférée
+            if players_with_favorite_card:
+                players_mentions = ", ".join([f"<@{player_id}>" for player_id in players_with_favorite_card])
+                embed_bonus = discord.Embed(
+                    title="**Bonus**",
+                    description=f"Congratulations {ctx.author.mention}\nYou received a bonus of **{bonus_amount}** <:HCoins:1134169003657547847> for dropping the favorite card of {players_mentions}.",
+                    color=discord.Color.gold()
+                )
+                await ctx.send(embed=embed_bonus)
 
         else:
             # Récompense en argent
