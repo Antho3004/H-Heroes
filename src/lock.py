@@ -17,7 +17,6 @@ class Lock(commands.Cog):
         successful_locks = []
         unsuccessful_locks = []
         already_locked = []
-        print(user_id)
         for code_card in code_cards:
             cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ? and user_id = ?", (code_card, user_id))
             card_data = cursor.fetchone()
