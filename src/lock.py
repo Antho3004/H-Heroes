@@ -13,19 +13,20 @@ class Lock(commands.Cog):
 
     @commands.command()
     async def lock(self, ctx, *code_cards):
+        user_id = ctx.author.id
         successful_locks = []
         unsuccessful_locks = []
         already_locked = []
-
+        print(user_id)
         for code_card in code_cards:
-            cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ?", (code_card,))
+            cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ? and user_id = ?", (code_card, user_id))
             card_data = cursor.fetchone()
 
             if card_data:
                 # Vérifiez si la carte n'est pas déjà verrouillée
                 if not card_data[13]: 
                     # Mettez à jour la colonne lock à True
-                    cursor.execute("UPDATE user_inventaire SET lock = ? WHERE code_card = ?", (True, code_card))
+                    cursor.execute("UPDATE user_inventaire SET lock = ? WHERE code_card = ? and user_id = ?", (True, code_card, user_id))
                     connection.commit()
                     successful_locks.append(code_card)
                 else:
@@ -50,19 +51,20 @@ class Lock(commands.Cog):
 
     @commands.command()
     async def unlock(self, ctx, *code_cards):
+        user_id = ctx.author.id
         successful_unlocks = []
         unsuccessful_unlocks = []
         already_unlocked = []
 
         for code_card in code_cards:
-            cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ?", (code_card,))
+            cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ? and user_id = ?", (code_card, user_id))
             card_data = cursor.fetchone()
 
             if card_data:
                 # Vérifiez si la carte est verrouillée
                 if card_data[13]:
                     # Mettez à jour la colonne lock à False
-                    cursor.execute("UPDATE user_inventaire SET lock = ? WHERE code_card = ?", ("NULL", code_card))
+                    cursor.execute("UPDATE user_inventaire SET lock = ? WHERE code_card = ? and user_id = ?", (False, code_card, user_id))
                     connection.commit()
                     successful_unlocks.append(code_card)
                 else:
@@ -86,11 +88,14 @@ class Lock(commands.Cog):
             await ctx.send(embed=embed_fail)
 
     @commands.command()
-    async def lock_view(self, ctx):
-        cursor.execute("SELECT * FROM user_inventaire WHERE lock = ? AND user_id = ? ORDER BY groupe, nom, rarete", (True, ctx.author.id))
+    async def lock_view(self, ctx, member: discord.Member = None):  # Ajout du paramètre "member"
+        if member is None:
+            member = ctx.author  # Utilisateur par défaut : l'auteur du message
+
+        cursor.execute("SELECT * FROM user_inventaire WHERE lock = ? AND user_id = ? ORDER BY groupe, nom, rarete", (True, member.id))
         locked_cards_data = cursor.fetchall()
 
-        cursor.execute("SELECT COUNT(*) FROM user_inventaire WHERE lock = ? AND user_id = ?", (True, ctx.author.id))
+        cursor.execute("SELECT COUNT(*) FROM user_inventaire WHERE lock = ? AND user_id = ?", (True, member.id))
         count = cursor.fetchone()[0]
 
         if locked_cards_data:
