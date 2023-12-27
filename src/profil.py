@@ -37,6 +37,9 @@ class Profil(commands.Cog):
             cursor.execute("SELECT COALESCE(legendary, 0) FROM user_data WHERE user_id = ?", (str(user.id),))
             packs_legendaire = cursor.fetchone()[0]
 
+            cursor.execute("SELECT COALESCE(training, 0) FROM user_data WHERE user_id = ?", (str(user.id),))
+            packs_training = cursor.fetchone()[0]
+
             cursor.execute("SELECT COALESCE(work, 0) FROM user_data WHERE user_id = ?", (str(user.id),))
             number_work = cursor.fetchone()[0]
 
@@ -62,7 +65,7 @@ class Profil(commands.Cog):
 
         embed = discord.Embed(title=f"{user.name}'s profile", description=description, color=discord.Color.blue())
         embed.add_field(name="", value=f":moneybag: **Wallet** : {formatted_argent} <:HCoins:1134169003657547847>\n:flower_playing_cards: **Inventory** : {nombre_de_cartes}\n:heart: **Favorite card** : {carte_favori}\n:hammer_pick: **Works** : {number_work}", inline=False)
-        embed.add_field(name="PACKS", value=f"<:Bronze:1136312536665440387> **Bronze** : {packs_bronze}\n<:Argent:1136312524900401213> **Silver** : {packs_silver}\n<:Gold:1136312506957189131> **Gold** : {packs_gold}\n<:Legendary:1136312609449193544> **Legendary** : {packs_legendaire}", inline=False)
+        embed.add_field(name="PACKS", value=f"<:Bronze:1136312536665440387> **Bronze** : {packs_bronze}\n<:Argent:1136312524900401213> **Silver** : {packs_silver}\n<:Gold:1136312506957189131> **Gold** : {packs_gold}\n<:Legendary:1136312609449193544> **Legendary** : {packs_legendaire}\n:person_lifting_weights: **Training** : {packs_training}", inline=False)
         embed.add_field(name="ACHIEVEMENT", value=f"Soon\n", inline=False)
 
         embed.set_image(url=img_fav)

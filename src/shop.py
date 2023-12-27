@@ -24,6 +24,7 @@ class Shop(commands.Cog):
         embed.add_field(name="", value=f"<:Argent:1136312524900401213> **Silver** (5 cards U/R/E): **7000** <:HCoins:1134169003657547847>", inline=False)
         embed.add_field(name="", value=f"<:Gold:1136312506957189131> **Gold** (5 cards R/E/L) : **20000** <:HCoins:1134169003657547847>", inline=False)
         embed.add_field(name="", value=f"<:Legendary:1136312609449193544> **Legendary** (5 cards L): **50000** <:HCoins:1134169003657547847>", inline=False)
+        embed.add_field(name="", value=f":person_lifting_weights: **Training** : **10000** <:HCoins:1134169003657547847>", inline=False)
 
         # Envoyez l'embed
         await ctx.send(embed=embed)
@@ -34,12 +35,13 @@ class Shop(commands.Cog):
             "bronze": 3000,
             "silver": 7000,
             "gold": 20000,
-            "legendary": 50000
+            "legendary": 50000,
+            "training": 10000
         }
 
         pack_name_lower = pack_name.lower()
         if pack_name_lower not in packs:
-            embed = discord.Embed(title="**SHOP**", description="This pack does not exist. Available packs: **bronze**/**silver**/**gold**/**legendary**", color=discord.Color.red())
+            embed = discord.Embed(title="**SHOP**", description="This pack does not exist. Available packs: **bronze**/**silver**/**gold**/**legendary**/**training**", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
@@ -50,17 +52,18 @@ class Shop(commands.Cog):
         with sqlite3.connect("HallyuHeroes.db") as connection:
             cursor = connection.cursor()
 
-            cursor.execute("SELECT argent, bronze, silver, gold, legendary FROM user_data WHERE user_id = ?", (user_id,))
+            cursor.execute("SELECT argent, bronze, silver, gold, legendary, training FROM user_data WHERE user_id = ?", (user_id,))
             result = cursor.fetchone()
 
             if result:
-                user_money, bronze_packs, silver_packs, gold_packs, legendary_packs = result
+                user_money, bronze_packs, silver_packs, gold_packs, legendary_packs, training_packs = result
 
                 # Handle NULL values and set to 0
                 bronze_packs = bronze_packs or 0
                 silver_packs = silver_packs or 0
                 gold_packs = gold_packs or 0
                 legendary_packs = legendary_packs or 0
+                training_packs = training_packs or 0
 
                 if user_money >= price:
                     # Déduire le prix du pack de l'argent de l'utilisateur
@@ -75,8 +78,10 @@ class Shop(commands.Cog):
                         gold_packs += 1
                     elif pack_name_lower == "legendary":
                         legendary_packs += 1
+                    elif pack_name_lower == "training":
+                        training_packs += 1
 
-                    cursor.execute("UPDATE user_data SET argent = ?, bronze = ?, silver = ?, gold = ?, legendary = ? WHERE user_id = ?", (new_money, bronze_packs, silver_packs, gold_packs, legendary_packs, user_id))
+                    cursor.execute("UPDATE user_data SET argent = ?, bronze = ?, silver = ?, gold = ?, legendary = ?, training = ? WHERE user_id = ?", (new_money, bronze_packs, silver_packs, gold_packs, legendary_packs, training_packs, user_id))
                     connection.commit()
 
                     cursor.execute("SELECT argent FROM user_data WHERE user_id = ?", (str(user_id),))
