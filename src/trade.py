@@ -34,6 +34,12 @@ class Trade(commands.Cog):
                 await ctx.send(embed=embed)
                 continue
 
+            # Vérifier si la carte est verrouillée
+            if card_data[13]: 
+                embed = discord.Embed(description=f"You can't gift the locked card `{code_card}`", color=discord.Color.red())
+                await ctx.send(embed=embed)
+                continue
+
             # Vérifier si la carte se trouve dans le marché
             cursor.execute("SELECT * FROM market WHERE code_card = ?", (code_card,))
             market_card_data = cursor.fetchone()
