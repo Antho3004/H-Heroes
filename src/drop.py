@@ -11,7 +11,7 @@ class Drop(commands.Cog):
         self.bot = bot
     
         self.cartes_preferees = {
-            307595556325425174: [("Kim Lip", "LOONA"), ("Kim Lip", "ARTMS"), ("Nana", "EL7Z UP"), ("Nana", "Woo!ah!") ("B.I", "SOLOISTS")],  #Antho
+            307595556325425174: [("Kim Lip", "LOONA"), ("Kim Lip", "ARTMS"), ("Nana", "EL7Z UP"), ("Nana", "Woo!ah!"), ("B.I", "SOLOISTS")],  #Antho
             403661101385908225: [("Lisa", "BLACKPINK"), ("Lisa", "SOLOISTS"), ("Minnie", "(G)I-DLE"), ("Jackson", "GOT7"), ("Jackson Wang", "SOLOISTS")], #Royal
             820035016242757653: [("Chanyeol", "EXO"), ("Chanyeol", "SOLOISTS"), ("Suho", "EXO"), ("Suho", "SOLOISTS"), ("Woosung", "The Rose"), ("Woosung", "SOLOISTS")],#Kelly
             154322614515531776: [("Yena", "IZ*ONE"), ("Yena", "SOLOISTS"), ("Chungha", "SOLOISTS"), ("Momo", "TWICE"), ("Momo", "MISAMO")], # Zmix
