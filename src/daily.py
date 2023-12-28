@@ -11,18 +11,18 @@ class Daily(commands.Cog):
         self.bot = bot
     
         self.cartes_preferees = {
-            307595556325425174: [("Kim Lip", "LOONA"), ("Kim Lip", "ARTMS"), ("Nana", "EL7Z UP"), ("B.I", "SOLOISTS")],  #Antho
+            307595556325425174: [("Kim Lip", "LOONA"), ("Kim Lip", "ARTMS"), ("Nana", "EL7Z UP"), ("Nana", "Woo!ah!") ("B.I", "SOLOISTS")],  #Antho
             403661101385908225: [("Lisa", "BLACKPINK"), ("Lisa", "SOLOISTS"), ("Minnie", "(G)I-DLE"), ("Jackson", "GOT7"), ("Jackson Wang", "SOLOISTS")], #Royal
             820035016242757653: [("Chanyeol", "EXO"), ("Chanyeol", "SOLOISTS"), ("Suho", "EXO"), ("Suho", "SOLOISTS"), ("Woosung", "The Rose"), ("Woosung", "SOLOISTS")],#Kelly
             154322614515531776: [("Yena", "IZ*ONE"), ("Yena", "SOLOISTS"), ("Chungha", "SOLOISTS"), ("Momo", "TWICE"), ("Momo", "MISAMO")], # Zmix
             757723242763911300: [("Kazuha", "Le sserafim"), ("Julie", "Kiss of life"), ("Xiaoting", "Kep1er")], # Koro
             297758951230144513: [("Chaewon", "Le sserafim"), ("Chaewon", "IZ*ONE"), ("Bae", "NMIXX"), ("Haerin", "Newjeans")], # Vision
-            396221256715862026: [("Gahyeon", "Dreamcatcher"), ("Suzy", "MissA"), ("Suzy", "SOLOISTS"), ("Bona", "WJSN"), ("Bona", "WJSN The Black")], # Rayleigh
+            396221256715862026: [("Gahyeon", "Dreamcatcher"), ("Suzy", "MissA"), ("Suzy", "SOLOISTS"), ("Suzy", "SOLOIST"), ("Bona", "WJSN"), ("Bona", "WJSN The Black")], #Rayleigh
             906220412919246898: [("Sana", "Twice"), ("Sana", "MISAMO"), ("Sumin", "STAYC"), ("Jihyo", "TWICE")], # Roswel
             304193355141873666: [("Hani", "EXID"), ("Siwon", "Super Junior"), ("Max Changmin", "TVXQ"), ("Max Changmin", "SOLOISTS")], # Walpole
             929379626558586910: [("Hui", "Pentagon"), ("Mingi", "Ateez"), ("Yeosang", "Ateez")], # Unnilie
             254635682184560641: [("Winter", "aespa"), ("Winter", "GIRLS ON TOP"), ("Ryujin", "Itzy"), ("Taemin", "Shinee"), ("Taemin", "SOLOISTS")] # Osi
-            }  
+            } 
     
     def format_money(self, money):
         return "{:,}".format(money).replace(",", " ")
