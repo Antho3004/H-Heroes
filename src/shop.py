@@ -6,7 +6,7 @@ import random
 class Shop(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.allowed_users = {307595556325425174, 403661101385908225}  # Ajoutez les ID des utilisateurs autorisés ici
+        self.allowed_users = {307595556325425174, 403661101385908225, 820035016242757653}  # Ajoutez les ID des utilisateurs autorisés ici
 
     def is_allowed_user(self, ctx):
         # Votre logique pour vérifier si l'utilisateur est autorisé
@@ -24,19 +24,19 @@ class Shop(commands.Cog):
         embed.add_field(name="", value=f"<:Argent:1136312524900401213> **Silver** (5 cards U/R/E): **7000** <:HCoins:1134169003657547847>", inline=False)
         embed.add_field(name="", value=f"<:Gold:1136312506957189131> **Gold** (5 cards R/E/L) : **20000** <:HCoins:1134169003657547847>", inline=False)
         embed.add_field(name="", value=f"<:Legendary:1136312609449193544> **Legendary** (5 cards L): **50000** <:HCoins:1134169003657547847>", inline=False)
-        embed.add_field(name="", value=f":person_lifting_weights: **Training** : **10000** <:HCoins:1134169003657547847>", inline=False)
+        embed.add_field(name="", value=f":person_lifting_weights: **Training** : **5000** <:HCoins:1134169003657547847>", inline=False)
 
         # Envoyez l'embed
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def buy_pack(self, ctx, pack_name: str):
+    async def buy_pack(self, ctx, pack_name: str, montant: int = 1):
         packs = {
             "bronze": 3000,
             "silver": 7000,
             "gold": 20000,
             "legendary": 50000,
-            "training": 10000
+            "training": 5000
         }
 
         pack_name_lower = pack_name.lower()
@@ -45,7 +45,7 @@ class Shop(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        price = packs[pack_name_lower]
+        price = packs[pack_name_lower] * montant
 
         # Vérifier si l'utilisateur a assez d'argent
         user_id = ctx.author.id
@@ -88,7 +88,7 @@ class Shop(commands.Cog):
                     updated_amount = cursor.fetchone()[0]
                     uptated_formatted_amount = self.format_money(updated_amount)
 
-                    embed = discord.Embed(title="Purchase Successful", description=f"You have purchased the pack {pack_name} !\n\nNew balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
+                    embed = discord.Embed(title="Purchase Successful", description=f"You have purchased **{montant}** pack **{pack_name}** !\n\nNew balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
                     await ctx.send(embed=embed)
                 else:
                     embed = discord.Embed(title="Insufficient Funds", description="You don't have enough money to buy this pack.", color=discord.Color.red())
