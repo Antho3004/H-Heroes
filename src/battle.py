@@ -302,17 +302,23 @@ class Battle(commands.Cog):
         owner_id, team_name, *team_cards = team_data
 
         embed = discord.Embed(
-            title=f"Team {team_name}",description=f"Team owner : <@{owner_id}>",
+            title=f"Team {team_name}", description=f"Team owner : <@{owner_id}>",
             color=discord.Color.blue()
         )
 
-        total_stats = 0  # Variable to store the total stats of all 5 cards
-        sorted_cards = []  # List to store card information for sorting
+        category_totals = {
+            "Sing": 0,
+            "Dance": 0,
+            "Rap": 0,
+            "Acting": 0,
+            "Modeling": 0
+        }
 
         for code_card in team_cards:
             # Fetch card information from the 'user_inventaire' table
             cursor.execute("""
                 SELECT nom, groupe, rarete, event,
+                        chant, dance, rap, acting, modeling,
                         chant + dance + rap + acting + modeling AS total_stat
                 FROM user_inventaire
                 WHERE user_id = ? AND code_card = ?
@@ -321,24 +327,27 @@ class Battle(commands.Cog):
             card_info = cursor.fetchone()
 
             if card_info:
-                total_stats += card_info[4]  # Add the stats of the current card to the total
-                sorted_cards.append((code_card, card_info))
+                for i, category in enumerate(["Sing", "Dance", "Rap", "Acting", "Modeling"]):
+                    category_totals[category] += card_info[4 + i]  # Add the stat of the current card to the category total
 
-        # Sort cards based on total stats in descending order
-        sorted_cards.sort(key=lambda x: x[1][4], reverse=True)
+                # Add a field for each category
+                embed.add_field(
+                    name=f"{card_info[0]} ({card_info[1]})",
+                    value=f"Code : `{code_card}`\nTotal Stat: **{card_info[9]}**",
+                    inline=False
+                )
+        
+        # Add a line of separation
+        embed.add_field(name="\u200b", value="**Total Stats by Category :**", inline=False)
 
-        for code_card, card_info in sorted_cards:
-            # Determine the rarity emoji based on the event and rarity
-            rarity_emojis = self.get_rarity_emojis(card_info[3], card_info[2])
+        # Add category totals to the embed
+        for category, total in category_totals.items():
+            embed.add_field(name=f"{category}", value=f"Total: **{total}**", inline=False)
 
-            embed.add_field(
-                name=f"{card_info[0]} ({card_info[1]}) {rarity_emojis}",
-                value=f"Code : `{code_card}`\nTotal Stat: **{card_info[4]}**",
-                inline=False
-            )
-
-        embed.set_footer(text=f"Total Stats for the Team: {total_stats}")
+        embed.set_footer(text=f"Total Stats for the Team: {sum(category_totals.values())}")
         await ctx.send(embed=embed)
+
+
 
     def get_rarity_emojis(self, event, rarity):
         if event and event.lower() == 'xmas 2023':
