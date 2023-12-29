@@ -71,15 +71,15 @@ class Shop(commands.Cog):
 
                     # Ajouter le pack à l'inventaire de l'utilisateur
                     if pack_name_lower == "bronze":
-                        bronze_packs += 1
+                        bronze_packs += montant
                     elif pack_name_lower == "silver":
-                        silver_packs += 1
+                        silver_packs += montant
                     elif pack_name_lower == "gold":
-                        gold_packs += 1
+                        gold_packs += montant
                     elif pack_name_lower == "legendary":
-                        legendary_packs += 1
+                        legendary_packs += montant
                     elif pack_name_lower == "training":
-                        training_packs += 1
+                        training_packs += montant
 
                     cursor.execute("UPDATE user_data SET argent = ?, bronze = ?, silver = ?, gold = ?, legendary = ?, training = ? WHERE user_id = ?", (new_money, bronze_packs, silver_packs, gold_packs, legendary_packs, training_packs, user_id))
                     connection.commit()
