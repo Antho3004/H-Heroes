@@ -393,8 +393,8 @@ class Shop(commands.Cog):
             return
 
         # Vérifier si la rareté du pack est valide
-        if pack_rarity.lower() not in ["bronze", "silver", "gold", "legendary"]:
-            embed = discord.Embed(title="Invalid Rarity", description="Invalid pack rarity. Available rarities: bronze, silver, gold, legendary", color=discord.Color.red())
+        if pack_rarity.lower() not in ["bronze", "silver", "gold", "legendary", "training"]:
+            embed = discord.Embed(title="Invalid Rarity", description="Invalid pack rarity. Available rarities: bronze, silver, gold, legendary, training", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
@@ -404,7 +404,7 @@ class Shop(commands.Cog):
             cursor.execute(f"UPDATE user_data SET {pack_rarity.lower()} = {pack_rarity.lower()} + ? WHERE user_id = ?", (amount, user.id))
             connection.commit()
 
-        embed = discord.Embed(title="Pack Added", description=f"{amount} {pack_rarity} pack{'s' if amount > 1 else ''} has been added to {user.mention}'s inventory.", color=discord.Color.green())
+        embed = discord.Embed(title="Pack Added", description=f"**{amount} {pack_rarity}** pack{'s' if amount > 1 else ''} has been added to {user.mention}'s inventory.", color=discord.Color.green())
         await ctx.send(embed=embed)
 
 async def setup(bot):
