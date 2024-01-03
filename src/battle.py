@@ -230,7 +230,7 @@ class Battle(commands.Cog):
 
     def create_loser_embed(self, ctx, winner_id, loser_id):
         loser_embed = discord.Embed(title=f"Battle result - {ctx.author.display_name}", color=discord.Colour.red())
-        loser_embed.add_field(name="Lose...", value=f"Sad <@{winner_id}> you lost {self.user_wins} - {self.opponent_wins} against <@{loser_id}>", inline=False)
+        loser_embed.add_field(name="Lose...", value=f"Sad <@{loser_id}> you lost {self.user_wins} - {self.opponent_wins} against <@{winner_id}>", inline=False)
         return loser_embed
     
     @commands.command()
