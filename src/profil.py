@@ -49,6 +49,11 @@ class Profil(commands.Cog):
             cursor.execute("SELECT team_favorite FROM user_data WHERE user_id = ?", (str(user.id),))
             team_favorite = cursor.fetchone()[0]
 
+            cursor.execute("SELECT battle_win, battle_lose FROM user_data WHERE user_id = ?", (str(user.id),))
+            battle_stat = cursor.fetchone()
+
+            win_rate = 0 if (battle_stat[0] + battle_stat[1]) == 0 else (battle_stat[0] / (battle_stat[0] +battle_stat[1])) * 100
+
             cursor.execute("select user_inventaire.image_url from user_data join user_inventaire on user_data.carte_favori = user_inventaire.code_card WHERE user_inventaire.user_id = ?", (str(user.id),))
             img_fav = cursor.fetchone()
 
@@ -73,7 +78,7 @@ class Profil(commands.Cog):
             return
 
         embed = discord.Embed(title=f"{user.name}'s profile", description=description, color=discord.Color.blue())
-        embed.add_field(name="", value=f":moneybag: **Wallet** : {formatted_argent} <:HCoins:1134169003657547847>\n:flower_playing_cards: **Inventory** : {nombre_de_cartes}\n:heart: **Favorite card** : {carte_favori}\n<:team:1190045726139494440> **Favorite team** : {team_favorite}\n:hammer_pick: **Works** : {number_work}", inline=False)
+        embed.add_field(name="", value=f":moneybag: **Wallet** : {formatted_argent} <:HCoins:1134169003657547847>\n:flower_playing_cards: **Inventory** : {nombre_de_cartes}\n:heart: **Favorite card** : {carte_favori}\n<:team:1190045726139494440> **Favorite team** : {team_favorite}\n:crossed_swords: **Battle Winrate : {win_rate:.2f}%**\n:hammer_pick: **Works** : {number_work}", inline=False)
         embed.add_field(name="PACKS", value=f"<:Bronze:1136312536665440387> **Bronze** : {packs_bronze}\n<:Argent:1136312524900401213> **Silver** : {packs_silver}\n<:Gold:1136312506957189131> **Gold** : {packs_gold}\n<:Legendary:1136312609449193544> **Legendary** : {packs_legendaire}\n:person_lifting_weights: **Training** : {packs_training}", inline=False)
         embed.add_field(name="ACHIEVEMENT", value=f"Soon\n", inline=False)
 

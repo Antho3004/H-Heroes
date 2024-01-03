@@ -28,6 +28,8 @@ class Bot(commands.Bot):
         await self.load_extension("lock")
         await self.load_extension("atlas")
         await self.load_extension("battle")
+        await self.load_extension("rank")
+        await self.load_extension("team")
         await self.load_extension("wishlist")
         #await self.load_extension("fuse")
         await self.tree.sync()

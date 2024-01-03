@@ -71,7 +71,7 @@ class Work(commands.Cog):
 
     @commands.command()
     @has_favorite_card()
-    @commands.cooldown(1, 1800, commands.BucketType.user)
+    @commands.cooldown(1, 1200, commands.BucketType.user)
     async def work(self, ctx):
         user = ctx.author
 

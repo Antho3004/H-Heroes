@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import sqlite3
+import random
 from dispie import Paginator
 
 connection = sqlite3.connect("HallyuHeroes.db")
@@ -9,405 +10,270 @@ cursor = connection.cursor()
 class Battle(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.rounds_to_win = 3
+        self.user_choices = {}
+        self.opponent_choices = {}
+        self.user_wins = 0
+        self.opponent_wins = 0
 
     @commands.command()
-    async def rank_stats(self, ctx, member: discord.Member = None):
-        user_id = member.id if member else ctx.author.id
-        user_name = member.name if member else ctx.author.name
-
-        # Récupérer les cartes de l'utilisateur depuis la base de données
-        cursor.execute("SELECT nom, groupe, code_card, rarete, event, chant, dance, rap, acting, modeling FROM user_inventaire WHERE user_id = ?", (user_id,))
-        user_cards = cursor.fetchall()
-
-        # Calculer la somme des compétences pour chaque carte et les classer
-        ranked_cards = sorted(user_cards, key=lambda card: sum(card[5:]), reverse=True)
-
-        # Créer des pages pour l'affichage paginé
-        chunks = [ranked_cards[i:i + 10] for i in range(0, len(ranked_cards), 10)]
-
-        embeds = []
-        for i, chunk in enumerate(chunks):
-            embed = discord.Embed(title=f"Rank Stat - {user_name}", color=discord.Color.blue())
-            for j, card in enumerate(chunk):
-                position = i * 10 + j + 1
-                total_score = sum(card[5:])
-                if position == 1:
-                    emoji = ":first_place:"
-                elif position == 2:
-                    emoji = ":second_place:"
-                elif position == 3:
-                    emoji = ":third_place:"
-                else:
-                    emoji = f"{position}."
-                
-                if card[4] and card[4].lower() == 'xmas 2023':
-                    rarity_emojis = {
-                        "U": "<:xmas_boot:1183911398661693631>",
-                        "L": "<:xmas_hat:1183911360808112160>"
-                    }
-                elif card[4] and card[4].lower() == 'new year 2024':
-                    rarity_emojis = {
-                        "R": "<:NY_Confetti:1185996235551805470>",
-                        "L": "<:NY_Fireworks:1185996232477384808>"
-                    }
-                else:
-                    rarity_emojis = {
-                        "C": "<:C_:1107771999490686987>",
-                        "U": "<:U_:1107772008193867867>",
-                        "R": "<:R_:1107772004410601553>",
-                        "E": "<:E_:1107772001747222550>",
-                        "L": "<:L_:1107772002690945055>"
-                    }
-                embed.add_field(name=f"{emoji} {card[0]} {card[1]} {rarity_emojis.get(card[3], '')}", value=f"Code: `{card[2]}` : **{total_score}**", inline=False)
-
-            embed.set_footer(text=f"Page {i + 1}/{len(chunks)}")
-            embeds.append(embed)
-
-        # Afficher les pages avec Paginator
-        paginator = Paginator(embeds)
-        await paginator.start(ctx)
-    
-    @commands.command()
-    async def rank_stats_global(self, ctx):
-
-        # Récupérer les cartes de l'utilisateur depuis la base de données
-        cursor.execute("SELECT user_id, nom, groupe, code_card, rarete, event, chant, dance, rap, acting, modeling FROM user_inventaire")
-        user_cards = cursor.fetchall()
-
-        # Calculer la somme des compétences pour chaque carte et les classer
-        ranked_cards = sorted(user_cards, key=lambda card: sum(card[6:]), reverse=True)
-
-        # Créer des pages pour l'affichage paginé
-        chunks = [ranked_cards[i:i + 10] for i in range(0, len(ranked_cards), 10)]
-
-        embeds = []
-        for i, chunk in enumerate(chunks):
-            embed = discord.Embed(title=f"Rank Stats Global", color=discord.Color.blue())
-            for j, card in enumerate(chunk):
-                position = i * 10 + j + 1
-                total_score = sum(card[6:])
-                if position == 1:
-                    emoji = ":first_place:"
-                elif position == 2:
-                    emoji = ":second_place:"
-                elif position == 3:
-                    emoji = ":third_place:"
-                else:
-                    emoji = f"{position}."
-                
-                if card[5] and card[5].lower() == 'xmas 2023':
-                    rarity_emojis = {
-                        "U": "<:xmas_boot:1183911398661693631>",
-                        "L": "<:xmas_hat:1183911360808112160>"
-                    }
-                elif card[5] and card[5].lower() == 'new year 2024':
-                    rarity_emojis = {
-                        "R": "<:NY_Confetti:1185996235551805470>",
-                        "L": "<:NY_Fireworks:1185996232477384808>"
-                    }
-                else:
-                    rarity_emojis = {
-                        "C": "<:C_:1107771999490686987>",
-                        "U": "<:U_:1107772008193867867>",
-                        "R": "<:R_:1107772004410601553>",
-                        "E": "<:E_:1107772001747222550>",
-                        "L": "<:L_:1107772002690945055>"
-                    }
-                embed.add_field(name=f"{emoji} {card[1]} {card[2]} {rarity_emojis.get(card[4], '')}", value=f"Code: `{card[3]}` : **{total_score}**\nOwner : <@{card[0]}>", inline=False)
-
-            embed.set_footer(text=f"Page {i + 1}/{len(chunks)}")
-            embeds.append(embed)
-
-        # Afficher les pages avec Paginator
-        paginator = Paginator(embeds)
-        await paginator.start(ctx)
-    
-    @commands.command()
-    async def create_team(self, ctx, team_name, code_card1, code_card2, code_card3, code_card4, code_card5):
+    @commands.cooldown(1, 1200, commands.BucketType.user)
+    async def battle(self, ctx):
         user_id = ctx.author.id
 
-        # Check if the user provided exactly 5 unique cards
-        if len(set([team_name, code_card1, code_card2, code_card3, code_card4, code_card5])) != 6:
-            embed = discord.Embed(title="Team Creation Failed",
-                                description="To create a team, please follow this format: teamName + codeCarte + codeCarte + codeCarte + codeCarte + codeCarte",
-                                color=discord.Color.red())
+        cursor.execute("SELECT team_favorite FROM user_data WHERE user_id = ?", (user_id,))
+        user_team = cursor.fetchone()
+
+        if user_team is None:
+            embed = discord.Embed(title="Error", description="You don't have a team.", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
-        # Check if the user entered exactly 5 cards after the team name
-        if not all([code_card1, code_card2, code_card3, code_card4, code_card5]):
-            embed = discord.Embed(title="Team Creation Failed",
-                                description="To create a team, please follow this format: teamName + codeCarte + codeCarte + codeCarte + codeCarte + codeCarte",
-                                color=discord.Color.red())
+        cursor.execute("SELECT * FROM team WHERE team_name = ?", (user_team[0],))
+        user_team_info = cursor.fetchone()
+
+        cursor.execute("SELECT * FROM team WHERE team_name != ? AND user_id != ? ORDER BY RANDOM() LIMIT 1", (user_team[0], user_id))
+        opponent_team_info = cursor.fetchone()
+
+        if opponent_team_info is None:
+            embed = discord.Embed(title="Error", description="There are no other teams.", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
-        # Check if the user owns the specified cards in their inventory
-        cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND code_card IN (?, ?, ?, ?, ?)",
-                    (user_id, code_card1, code_card2, code_card3, code_card4, code_card5))
-        valid_cards = cursor.fetchall()
+        opponent_team_name = opponent_team_info[1]
+        opponent_user_id = opponent_team_info[0]
 
-        # Check if the team name is already taken
-        cursor.execute("SELECT team_name FROM team WHERE user_id = ? AND team_name = ?", (user_id, team_name))
-        existing_team = cursor.fetchone()
+        self.user_choices[ctx.author.id] = {"card": None, "category": None}
+        self.opponent_choices[opponent_user_id] = {"card": None, "category": None}
 
-        if existing_team:
-            embed = discord.Embed(title="Team Creation Failed",
-                                description=f"The team name **{team_name}** is already taken. Please choose a different name.",
-                                color=discord.Color.red())
-            await ctx.send(embed=embed)
-            return
+        embed = discord.Embed(title=f"Battle - {ctx.author.display_name}", color=discord.Colour.blue())
 
-        if len(valid_cards) == 5:
-            # Update the 'team' table with the cards and team name
-            cursor.execute("INSERT INTO team (user_id, team_name, code_card1, code_card2, code_card3, code_card4, code_card5) "
-                        "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                        (user_id, team_name, code_card1, code_card2, code_card3, code_card4, code_card5))
-            connection.commit()
+        embed.add_field(name="My Team", value=f"{user_team[0]}\nOwner: <@{user_id}>", inline=True)
+        embed.add_field(name="VS", value="", inline=True)
+        embed.add_field(name=f"Opposing team", value=f"{opponent_team_name}\nOwner: <@{opponent_user_id}>", inline=True)
 
-            embed = discord.Embed(title="Team Created",
-                                description=f"Your team **{team_name}** has been successfully created!",
-                                color=discord.Color.green())
-            await ctx.send(embed=embed)
-        else:
-            embed = discord.Embed(title="Team Creation Failed",
-                                description="You must own all 5 specified cards in your inventory.",
-                                color=discord.Color.red())
-            await ctx.send(embed=embed)
+        user_cards_info = self.get_team_cards_info(user_team_info)
+        embed.add_field(name="My Team Cards", value=user_cards_info, inline=True)
 
-    @commands.command()
-    async def delete_team(self, ctx, team_name):
-        user_id = ctx.author.id
-
-        # Check if the specified team name exists for the user
-        cursor.execute("SELECT * FROM team WHERE user_id = ? AND team_name = ?", (user_id, team_name))
-        team_data = cursor.fetchone()
-
-        if team_data:
-            # Delete the team from the 'team' table
-            cursor.execute("DELETE FROM team WHERE user_id = ? AND team_name = ?", (user_id, team_name))
-            connection.commit()
-
-            embed = discord.Embed(title="Team Deleted",
-                                description=f"Your team **{team_name}** has been successfully deleted !",
-                                color=discord.Color.green())
-            await ctx.send(embed=embed)
-        else:
-            embed = discord.Embed(title="Team Deletion Failed",
-                                description=f"The team **{team_name}** does not exist.",
-                                color=discord.Color.red())
-            await ctx.send(embed=embed)
-    
-    @commands.command()
-    async def change(self, ctx, team_name, current_card, new_card):
-        user_id = ctx.author.id
-
-        # Check if the current card is in the user's team
-        cursor.execute("SELECT * FROM team WHERE user_id = ? AND team_name = ? AND (code_card1 = ? OR code_card2 = ? OR code_card3 = ? OR code_card4 = ? OR code_card5 = ?)",
-                    (user_id, team_name, current_card, current_card, current_card, current_card, current_card))
-        team_data = cursor.fetchone()
-
-        if not team_data:
-            embed = discord.Embed(title="Card Change Failed",
-                                description=f"The specified current card is not in your team **{team_name}**",
-                                color=discord.Color.red())
-            await ctx.send(embed=embed)
-            return
-
-        # Check if the new card is in the user's inventory
-        cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND code_card = ?", (user_id, new_card))
-        new_card_in_inventory = cursor.fetchone()
-
-        if not new_card_in_inventory:
-            embed = discord.Embed(title="Card Change Failed",
-                                description=f"The card `{new_card}` is not in your inventory.",
-                                color=discord.Color.red())
-            await ctx.send(embed=embed)
-            return
-
-        # Update the user's team with the new card
-        cursor.execute(f"UPDATE team SET code_card{team_data.index(current_card) - 1} = ? WHERE user_id = ? AND team_name = ?",
-                    (new_card, user_id, team_name))
-        connection.commit()
-
-        embed = discord.Embed(title="Card Changed",
-                            description=f"Successfully changed your card from `{current_card}` to `{new_card}` in your team **{team_name}**",
-                            color=discord.Color.green())
+        opponent_cards_info = self.get_team_cards_info(opponent_team_info)
+        embed.add_field(name="Opposing Team Cards", value=f"{opponent_cards_info}", inline=True)
+        
         await ctx.send(embed=embed)
 
-    @commands.command()
-    async def team(self, ctx, member: discord.Member = None):
-        if member is None:
-            member = ctx.author
+        # Initialiser le nombre de victoires de l'utilisateur
+        self.user_wins = 0
 
-        user_id = member.id
+        # Créer une liste de cartes disponibles pour chaque équipe
+        user_available_cards = list(user_team_info[2:])
+        opponent_available_cards = list(opponent_team_info[2:])
 
-        # Fetch teams for the specified user from the 'team' table
-        cursor.execute("SELECT team_name, code_card1, code_card2, code_card3, code_card4, code_card5 FROM team WHERE user_id = ?", (user_id,))
-        user_teams = cursor.fetchall()
+        while self.user_wins < self.rounds_to_win and self.opponent_wins < self.rounds_to_win:
+            # Choix aléatoire de la catégorie pour le round
+            category = self.get_random_category()
 
-        if not user_teams:
-            embed = discord.Embed(title=f"No Teams Found for {member.display_name}",
-                                description=f"{member.display_name} doesn't have any teams.",
-                                color=discord.Color.blue())
-            await ctx.send(embed=embed)
-            return
+            # Choix aléatoire des cartes pour chaque équipe dans la même catégorie
+            user_card = self.get_random_card(user_available_cards)
+            opponent_card = self.get_random_card(opponent_available_cards)
 
-        embed = discord.Embed(title=f"{member.display_name}'s Teams", color=discord.Color.blue())
+            self.user_choices[ctx.author.id] = {"card": user_card, "category": category}
+            self.opponent_choices[opponent_user_id] = {"card": opponent_card, "category": category}
 
-        for i, team in enumerate(user_teams, 1):
-            total_stats = 0  # Variable to store the total stats of all 5 cards
+            # Comparaison des statistiques des cartes pour la catégorie choisie
+            user_stat_category = user_card[6:11][self.get_category_index(category)]
+            opponent_stat_category = opponent_card[6:11][self.get_category_index(category)]
 
-            for code_card in team[1:]:
-                # Fetch card information from the 'user_inventaire' table
-                cursor.execute("""
-                    SELECT chant + dance + rap + acting + modeling AS total_stat
-                    FROM user_inventaire
-                    WHERE user_id = ? AND code_card = ?
-                """, (user_id, code_card))
+                # Détermination du vainqueur du round
+            if user_stat_category > opponent_stat_category:
+                round_winner = ctx.author.id
+                winning_card_name = user_card[3]  # Nom de la carte gagnante
+                cursor.execute("UPDATE user_data SET round_win = round_win + ? WHERE user_id = ?", (1, ctx.author.id))
+                connection.commit()
+            elif user_stat_category < opponent_stat_category:
+                round_winner = opponent_user_id
+                winning_card_name = opponent_card[3]  # Nom de la carte gagnante
+                cursor.execute("UPDATE user_data SET round_lose = round_lose + ? WHERE user_id = ?", (1, ctx.author.id))
+                connection.commit()
+            else:
+                # En cas d'égalité, vous pouvez définir une logique spécifique
+                round_winner = "égalité"
+                winning_card_name = "Nobody"
+                cursor.execute("UPDATE user_data SET round_equal = round_equal + ? WHERE user_id = ?", (1, ctx.author.id))
+                connection.commit()
 
-                card_info = cursor.fetchone()
+            # Incrémentation du score du vainqueur
+            if round_winner == ctx.author.id:
+                self.user_wins += 1
+            elif round_winner == opponent_user_id:
+                self.opponent_wins += 1
+            
+            # Retirer les cartes utilisées du pool de cartes disponibles
+            user_available_cards.remove(user_card[1])
+            opponent_available_cards.remove(opponent_card[1])
 
-                if card_info:
-                    total_stats += card_info[0]  # Add the stats of the current card to the total
+            # Création de l'embed pour le round
+            round_embed = discord.Embed(title=f"MATCH - {user_team[0]} VS {opponent_team_name}", color=discord.Colour.blue())
+            round_embed.add_field(name=f"",value=f"**Round {self.user_wins + self.opponent_wins} : {category}**", inline=False)
+            round_embed.add_field(name=f"{user_team[0]}", value=f"{user_card[2]} {user_card[3]}\n({user_card[1]})\nSTATS : **{user_stat_category}**", inline=True)
+            round_embed.add_field(name=f"{opponent_team_name}", value=f"{opponent_card[2]} {opponent_card[3]}\n({opponent_card[1]})\nSTATS : **{opponent_stat_category}**", inline=True)
 
-            embed.add_field(
-                name=f"Team {i} : {team[0]}",
-                value=f"Total stats : **{total_stats}**",
-                inline=False
-            )
+            if round_winner != "égalité":
+                round_embed.add_field(name="", value=f"Winner {winning_card_name} - <@{round_winner}>", inline=False)
+            else:
+                round_embed.add_field(name="Draw", value="The round is a draw", inline=False)
 
-        await ctx.send(embed=embed)
+            # Envoyer l'embed du round
+            await ctx.send(embed=round_embed)
 
-    @commands.command()
-    async def team_view(self, ctx, team_name):
-        user_id = ctx.author.id
+        # Vérification de l'équipe gagnante
+        winner_id = ctx.author.id if self.user_wins == self.rounds_to_win else opponent_user_id
+        loser_id = opponent_user_id if winner_id == ctx.author.id else ctx.author.id
 
-        # Fetch user information from the 'team' table
-        cursor.execute("""
-            SELECT user_id, team_name, code_card1, code_card2, code_card3, code_card4, code_card5
-            FROM team
-            WHERE team_name = ?
-        """, (team_name,))
+        # Création de l'embed de résultat en fonction du vainqueur
+        if winner_id == ctx.author.id:
+            cursor.execute("UPDATE user_data SET battle_win = battle_win + ? WHERE user_id = ?", (1, ctx.author.id))
+            connection.commit()
+            result_embed = self.create_winner_embed(ctx, winner_id, loser_id)
+        else:
+            cursor.execute("UPDATE user_data SET battle_lose = battle_lose + ? WHERE user_id = ?", (1, ctx.author.id))
+            connection.commit()
+            result_embed = self.create_loser_embed(ctx, winner_id, loser_id)
 
-        team_data = cursor.fetchone()
+        # Envoyer l'embed de résultat
+        await ctx.send(embed=result_embed)
 
-        if not team_data:
-            embed = discord.Embed(title=f"No Team Found",
-                                description=f"There is no team with the name **{team_name}**.",
-                                color=discord.Color.red())
-            await ctx.send(embed=embed)
-            return
+    def get_team_cards_info(self, team_info):
+        card_codes = team_info[2:]
+        cards_info = ""
 
-        owner_id, team_name, *team_cards = team_data
-
-        embed = discord.Embed(
-            title=f"Team {team_name}", description=f"Team owner : <@{owner_id}>",
-            color=discord.Color.blue()
-        )
-
-        category_totals = {
-            "Sing": 0,
-            "Dance": 0,
-            "Rap": 0,
-            "Acting": 0,
-            "Modeling": 0
-        }
-
-        for code_card in team_cards:
-            # Fetch card information from the 'user_inventaire' table
-            cursor.execute("""
-                SELECT nom, groupe, rarete, event,
-                        chant, dance, rap, acting, modeling,
-                        chant + dance + rap + acting + modeling AS total_stat
-                FROM user_inventaire
-                WHERE user_id = ? AND code_card = ?
-            """, (owner_id, code_card))
-
+        for code in card_codes:
+            cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ?", (code,))
             card_info = cursor.fetchone()
 
             if card_info:
-                for i, category in enumerate(["Sing", "Dance", "Rap", "Acting", "Modeling"]):
-                    category_totals[category] += card_info[4 + i]  # Add the stat of the current card to the category total
+                total_stats = sum(card_info[6:11])
+                cards_info += f"**{card_info[3]} ({card_info[2]})**\nCode : `{card_info[1]}`\nTotal Stats: **{total_stats}**\n\n"
 
-                # Add a field for each category
-                embed.add_field(
-                    name=f"{card_info[0]} ({card_info[1]})",
-                    value=f"Code : `{code_card}`\nTotal Stat: **{card_info[9]}**",
-                    inline=False
-                )
-        
-        # Add a line of separation
-        embed.add_field(name="\u200b", value="**Total Stats by Category :**", inline=False)
+        return cards_info
+    
+    def get_random_card(self, available_cards):
+        random_card_code = random.choice(available_cards)
+        cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ?", (random_card_code,))
+        return cursor.fetchone()
 
-        # Add category totals to the embed
-        for category, total in category_totals.items():
-            embed.add_field(name=f"{category}", value=f"Total: **{total}**", inline=False)
+    def get_random_category(self):
+        categories = ["dance", "sing", "rap", "acting", "modeling"]
+        return random.choice(categories)
 
-        embed.set_footer(text=f"Total Stats for the Team: {sum(category_totals.values())}")
-        await ctx.send(embed=embed)
+    def get_category_index(self, category):
+        # Retourne l'index de la catégorie dans la liste des catégories
+        return ["dance", "sing", "rap", "acting", "modeling"].index(category)
 
+    def create_winner_embed(self, ctx, winner_id, loser_id):
+        winner_embed = discord.Embed(title=f"Battle result - {ctx.author.display_name}", color=discord.Colour.green())
+        winner_embed.add_field(name="Victory !", value=f"Congratulations <@{winner_id}> you won {self.user_wins} - {self.opponent_wins} against <@{loser_id}>", inline=False)
 
+        # Ajouter des informations sur la récompense gagnée
+        reward_type = None
+        reward_amount = None
 
-    def get_rarity_emojis(self, event, rarity):
-        if event and event.lower() == 'xmas 2023':
-            return {
-                "U": "<:xmas_boot:1183911398661693631>",
-                "L": "<:xmas_hat:1183911360808112160>"
-            }.get(rarity, "")
-        elif event and event.lower() == 'new year 2024':
-            return {
-                "R": "<:NY_Confetti:1185996235551805470>",
-                "L": "<:NY_Fireworks:1185996232477384808>"
-            }.get(rarity, "")
-        else:
-            return {
-                "C": "<:C_:1107771999490686987>",
-                "U": "<:U_:1107772008193867867>",
-                "R": "<:R_:1107772004410601553>",
-                "E": "<:E_:1107772001747222550>",
-                "L": "<:L_:1107772002690945055>"
-            }.get(rarity, "")
+        # Chances pour les récompenses
+        argent_chance = 0.4
+        training_chance = 0.4
+        packs_bronze_chance = 0.05
+        packs_argent_chance = 0.05
+        packs_gold_chance = 0.05
+        packs_legendary_chance = 0.05
+
+        # Choisir une récompense en fonction des probabilités
+        rand_num = random.random()
+
+        if rand_num < argent_chance:
+            reward_type = "Money"
+            reward_amount = random.randint(250, 750)
+        elif rand_num < (argent_chance + training_chance):
+            reward_type = "Packs Training"
+            reward_amount = 10
+        elif rand_num < (argent_chance + training_chance + packs_bronze_chance):
+            reward_type = "Packs Bronze"
+            reward_amount = 10
+        elif rand_num < (argent_chance + training_chance + packs_bronze_chance + packs_argent_chance):
+            reward_type = "Packs Silver"
+            reward_amount = 5
+        elif rand_num < (argent_chance + training_chance + packs_bronze_chance + packs_argent_chance + packs_gold_chance):
+            reward_type = "Packs Gold"
+            reward_amount = 3
+        elif rand_num < (argent_chance + training_chance + packs_bronze_chance + packs_argent_chance + packs_gold_chance + packs_legendary_chance):
+            reward_type = "Packs Legendary"
+            reward_amount = 1
+
+        # Appliquer la récompense
+        if reward_type and reward_amount is not None:
+            if reward_type == "Money":
+                cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (reward_amount, winner_id))
+            elif reward_type == "Trainings":
+                cursor.execute("UPDATE user_data SET training = training + ? WHERE user_id = ?", (reward_amount, winner_id))
+            elif reward_type == "Packs Bronze":
+                cursor.execute("UPDATE user_data SET bronze = bronze + ? WHERE user_id = ?", (reward_amount, winner_id))
+            elif reward_type == "Packs Silver":
+                cursor.execute("UPDATE user_data SET silver = silver + ? WHERE user_id = ?", (reward_amount, winner_id))
+            elif reward_type == "Packs Gold":
+                cursor.execute("UPDATE user_data SET gold = gold + ? WHERE user_id = ?", (reward_amount, winner_id))
+            elif reward_type == "Packs Legendary":
+                cursor.execute("UPDATE user_data SET legendary = legendary + ? WHERE user_id = ?", (reward_amount, winner_id))
+
+            connection.commit()
+
+            # Ajouter la récompense à l'embed
+            winner_embed.add_field(name="Reward earned", value=f"{reward_type} : **{reward_amount}**", inline=False)
+
+        return winner_embed
+
+    def create_loser_embed(self, ctx, winner_id, loser_id):
+        loser_embed = discord.Embed(title=f"Battle result - {ctx.author.display_name}", color=discord.Colour.red())
+        loser_embed.add_field(name="Lose...", value=f"Sad <@{winner_id}> you lost {self.user_wins} - {self.opponent_wins} against <@{loser_id}>", inline=False)
+        return loser_embed
     
     @commands.command()
-    async def rank_teams(self, ctx):
-        # Récupérer les équipes depuis la base de données
-        cursor.execute("SELECT user_id, team_name, code_card1, code_card2, code_card3, code_card4, code_card5 FROM team")
-        teams_data = cursor.fetchall()
+    async def battle_stats(self, ctx, member: discord.Member = None):
+        if member is None:
+            user_id = ctx.author.id
+            user_display_name = ctx.author.display_name
+        else:
+            user_id = member.id
+            user_display_name = member.display_name
 
-        # Créer un dictionnaire pour stocker les statistiques totales de chaque équipe
-        teams_stats = {}
+        # Récupérer les statistiques de l'utilisateur
+        cursor.execute("SELECT round_win, round_lose, round_equal, battle_win, battle_lose FROM user_data WHERE user_id = ?", (user_id,))
+        user_stats = cursor.fetchone()
 
-        for team_data in teams_data:
-            owner_id, team_name, *team_cards = team_data
-            total_stats = 0
-            for code_card in team_cards:
-                # Récupérer les statistiques de chaque carte depuis la table 'user_inventaire'
-                cursor.execute("""
-                    SELECT chant + dance + rap + acting + modeling AS total_stat
-                    FROM user_inventaire
-                    WHERE user_id = ? AND code_card = ?
-                """, (owner_id, code_card))
+        if user_stats is None:
+            await ctx.send(f"No statistics found for {user_display_name}.")
+            return
 
-                card_info = cursor.fetchone()
+        # Créer l'embed avec les statistiques
+        stats_embed = discord.Embed(title=f"Battle statistics - {user_display_name}", color=discord.Colour.blue())
+        stats_embed.add_field(name="Stats : ", value=f"- Rounds win : **{user_stats[0]}**\n- Rounds lose : **{user_stats[1]}**\n- Rounds equal : **{user_stats[2]}**\n- Battle win : **{user_stats[3]}**\n- Battle lose : **{user_stats[4]}**", inline=True)
 
-                if card_info:
-                    total_stats += card_info[0]  # Ajouter les statistiques de la carte actuelle au total
+        await ctx.send(embed=stats_embed)
+    
+    @commands.command()
+    async def battle_stats_global(self, ctx):
 
-            # Ajouter les statistiques totales de l'équipe au dictionnaire avec user_id
-            teams_stats[team_name] = {"total_stats": total_stats, "user_id": owner_id}
+        # Récupérer les cartes de l'utilisateur depuis la base de données
+        cursor.execute("SELECT user_id, battle_win, battle_lose FROM user_data")
+        user_stats = cursor.fetchall()
 
-        # Trier les équipes en fonction des statistiques totales en ordre décroissant
-        sorted_teams = sorted(teams_stats.items(), key=lambda x: x[1]["total_stats"], reverse=True)
+        # Calculer le winrate pour chaque utilisateur et les classer du plus haut au plus bas
+        ranked_battle = sorted(user_stats, key=lambda x: (0 if (x[1] + x[2]) == 0 else (x[1] / (x[1] + x[2])) * 100, x[1]), reverse=True)
 
         # Créer des pages pour l'affichage paginé
-        chunks = [sorted_teams[i:i + 10] for i in range(0, len(sorted_teams), 10)]
+        chunks = [ranked_battle[i:i + 10] for i in range(0, len(ranked_battle), 10)]
         embeds = []
-        for i, chunk in enumerate(chunks):
-            embed = discord.Embed(title="Rank Teams", color=discord.Color.blue())
-            for j, (team_name, data) in enumerate(chunk):
-                position = i * 10 + j + 1
 
+        for i, chunk in enumerate(chunks):
+            embed = discord.Embed(title=f"Rank Stats Global", color=discord.Color.blue())
+            for j, user in enumerate(chunk):
+                position = i * 10 + j + 1
                 if position == 1:
                     emoji = ":first_place:"
                 elif position == 2:
@@ -417,11 +283,9 @@ class Battle(commands.Cog):
                 else:
                     emoji = f"{position}."
 
-                embed.add_field(
-                    name=f"{emoji} {team_name}",
-                    value=f"\nTotal stats: **{data['total_stats']}**\nOwner : <@{data['user_id']}>",
-                    inline=False
-                )
+                win_rate = 0 if (user[1] + user[2]) == 0 else (user[1] / (user[1] + user[2])) * 100
+
+                embed.add_field(name=f"", value=f"{emoji} <@{user[0]}>\nVictory : **{user[1]}** - Lose : **{user[2]}**\nWinrate : **{win_rate:.2f}%**", inline=False)
 
             embed.set_footer(text=f"Page {i + 1}/{len(chunks)}")
             embeds.append(embed)

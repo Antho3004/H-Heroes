@@ -41,7 +41,10 @@ class Help(commands.Cog):
             "- `$change [team name] [Old card] [New Card]` : Replace a card from your team with a new card",
             "- `$team` : Display all your teams",
             "- `$team_view [team name]` : Displays team with 5 cards and stats",
-            "- `$rank_teams` : Displays a ranking of all teams"
+            "- `$rank_teams` : Displays a ranking of all teams",
+            "- `$battle` : Start a battle against another team",
+            "- `$battle_stats` : Display your battle stats",
+            "- `$battle_stats_global` : Display battle stats for all players"
         ]
 
         embed_pages = []
