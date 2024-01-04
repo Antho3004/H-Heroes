@@ -62,6 +62,7 @@ class Battle(commands.Cog):
 
         # Initialiser le nombre de victoires de l'utilisateur
         self.user_wins = 0
+        self.opponent_wins = 0
 
         # Créer une liste de cartes disponibles pour chaque équipe
         user_available_cards = list(user_team_info[2:])
