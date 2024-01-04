@@ -178,34 +178,18 @@ class Battle(commands.Cog):
         reward_amount = None
 
         # Chances pour les récompenses
-        argent_chance = 0.4
-        training_chance = 0.4
-        packs_bronze_chance = 0.05
-        packs_argent_chance = 0.05
-        packs_gold_chance = 0.05
-        packs_legendary_chance = 0.05
+        argent_chance = 0.5
+        training_chance = 0.5
 
         # Choisir une récompense en fonction des probabilités
         rand_num = random.random()
 
         if rand_num < argent_chance:
             reward_type = "Money"
-            reward_amount = random.randint(250, 750)
+            reward_amount = random.randint(1000, 2000)
         elif rand_num < (argent_chance + training_chance):
             reward_type = "Packs Training"
             reward_amount = 10
-        elif rand_num < (argent_chance + training_chance + packs_bronze_chance):
-            reward_type = "Packs Bronze"
-            reward_amount = 10
-        elif rand_num < (argent_chance + training_chance + packs_bronze_chance + packs_argent_chance):
-            reward_type = "Packs Silver"
-            reward_amount = 5
-        elif rand_num < (argent_chance + training_chance + packs_bronze_chance + packs_argent_chance + packs_gold_chance):
-            reward_type = "Packs Gold"
-            reward_amount = 3
-        elif rand_num < (argent_chance + training_chance + packs_bronze_chance + packs_argent_chance + packs_gold_chance + packs_legendary_chance):
-            reward_type = "Packs Legendary"
-            reward_amount = 1
 
         # Appliquer la récompense
         if reward_type and reward_amount is not None:
@@ -213,14 +197,6 @@ class Battle(commands.Cog):
                 cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (reward_amount, winner_id))
             elif reward_type == "Packs Training":
                 cursor.execute("UPDATE user_data SET training = training + ? WHERE user_id = ?", (reward_amount, winner_id))
-            elif reward_type == "Packs Bronze":
-                cursor.execute("UPDATE user_data SET bronze = bronze + ? WHERE user_id = ?", (reward_amount, winner_id))
-            elif reward_type == "Packs Silver":
-                cursor.execute("UPDATE user_data SET silver = silver + ? WHERE user_id = ?", (reward_amount, winner_id))
-            elif reward_type == "Packs Gold":
-                cursor.execute("UPDATE user_data SET gold = gold + ? WHERE user_id = ?", (reward_amount, winner_id))
-            elif reward_type == "Packs Legendary":
-                cursor.execute("UPDATE user_data SET legendary = legendary + ? WHERE user_id = ?", (reward_amount, winner_id))
 
             connection.commit()
 
