@@ -211,7 +211,7 @@ class Battle(commands.Cog):
         if reward_type and reward_amount is not None:
             if reward_type == "Money":
                 cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (reward_amount, winner_id))
-            elif reward_type == "Trainings":
+            elif reward_type == "Packs Training":
                 cursor.execute("UPDATE user_data SET training = training + ? WHERE user_id = ?", (reward_amount, winner_id))
             elif reward_type == "Packs Bronze":
                 cursor.execute("UPDATE user_data SET bronze = bronze + ? WHERE user_id = ?", (reward_amount, winner_id))
