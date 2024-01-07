@@ -24,7 +24,7 @@ class Shop(commands.Cog):
         embed.add_field(name="", value=f"<:Argent:1136312524900401213> **Silver** (5 cards U/R/E): **7000** <:HCoins:1134169003657547847>", inline=False)
         embed.add_field(name="", value=f"<:Gold:1136312506957189131> **Gold** (5 cards R/E/L) : **20000** <:HCoins:1134169003657547847>", inline=False)
         embed.add_field(name="", value=f"<:Legendary:1136312609449193544> **Legendary** (5 cards L): **50000** <:HCoins:1134169003657547847>", inline=False)
-        embed.add_field(name="", value=f":person_lifting_weights: **Training** : **5000** <:HCoins:1134169003657547847>", inline=False)
+        embed.add_field(name="", value=f":person_lifting_weights: **Training** : **2500** <:HCoins:1134169003657547847>", inline=False)
 
         # Envoyez l'embed
         await ctx.send(embed=embed)
@@ -36,7 +36,7 @@ class Shop(commands.Cog):
             "silver": 7000,
             "gold": 20000,
             "legendary": 50000,
-            "training": 5000
+            "training": 2500
         }
 
         pack_name_lower = pack_name.lower()

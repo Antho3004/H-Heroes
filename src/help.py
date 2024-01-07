@@ -44,7 +44,8 @@ class Help(commands.Cog):
             "- `$rank_teams` : Displays a ranking of all teams",
             "- `$battle` : Start a battle against another team",
             "- `$battle_stats` : Display your battle stats",
-            "- `$battle_stats_global` : Display battle stats for all players"
+            "- `$battle_stats_global` : Display battle stats for all players",
+            "- `$ranked` : Displays a ranking based on Heroes Points"
         ]
 
         embed_pages = []

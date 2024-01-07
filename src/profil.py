@@ -54,6 +54,10 @@ class Profil(commands.Cog):
 
             win_rate = 0 if (battle_stat[0] + battle_stat[1]) == 0 else (battle_stat[0] / (battle_stat[0] +battle_stat[1])) * 100
 
+            cursor.execute("SELECT Heroes_points FROM user_data WHERE user_id = ?", (str(user.id),))
+            heroes_points = cursor.fetchone()[0]
+            print(heroes_points)
+
             cursor.execute("select user_inventaire.image_url from user_data join user_inventaire on user_data.carte_favori = user_inventaire.code_card WHERE user_inventaire.user_id = ?", (str(user.id),))
             img_fav = cursor.fetchone()
 
@@ -72,13 +76,28 @@ class Profil(commands.Cog):
             if img_fav is not None:
                 img_fav = img_fav[0]
 
+            if heroes_points == 0:
+                ranked = "unranked"
+            elif heroes_points > 1 and heroes_points <= 1000:
+                ranked = "Bronze"
+            elif heroes_points > 1000 and heroes_points <= 2000:
+                ranked = "Silver"
+            elif heroes_points > 2000 and heroes_points <= 3000:
+                ranked = "Gold"
+            elif heroes_points > 3000 and heroes_points <=4000:
+                ranked = "Platinum"
+            elif heroes_points > 4000 and heroes_points <=5000:
+                ranked = "Diamond"
+            elif heroes_points > 5000:
+                ranked = "Heroes"
+
         else:
             embed = discord.Embed(title="**Profile Not Found**", description="You don't have an account, use `$start` to create one.", color=discord.Color.red())
             await ctx.send(embed=embed)
             return
 
         embed = discord.Embed(title=f"{user.name}'s profile", description=description, color=discord.Color.blue())
-        embed.add_field(name="", value=f":moneybag: **Wallet** : {formatted_argent} <:HCoins:1134169003657547847>\n:flower_playing_cards: **Inventory** : {nombre_de_cartes}\n:heart: **Favorite card** : {carte_favori}\n<:team:1190045726139494440> **Favorite team** : {team_favorite}\n:crossed_swords: **Battle Winrate : {win_rate:.2f}%**\n:hammer_pick: **Works** : {number_work}", inline=False)
+        embed.add_field(name="", value=f":moneybag: **Wallet** : {formatted_argent} <:HCoins:1134169003657547847>\n:flower_playing_cards: **Inventory** : {nombre_de_cartes}\n:heart: **Favorite card** : {carte_favori}\n<:team:1190045726139494440> **Favorite team** : {team_favorite}\n:crown: **Ranked** : **{ranked}**\n:crossed_swords: **Battle Winrate : {win_rate:.2f}%**\n:hammer_pick: **Works** : **{number_work}**", inline=False)
         embed.add_field(name="PACKS", value=f"<:Bronze:1136312536665440387> **Bronze** : {packs_bronze}\n<:Argent:1136312524900401213> **Silver** : {packs_silver}\n<:Gold:1136312506957189131> **Gold** : {packs_gold}\n<:Legendary:1136312609449193544> **Legendary** : {packs_legendaire}\n:person_lifting_weights: **Training** : {packs_training}", inline=False)
         embed.add_field(name="ACHIEVEMENT", value=f"Soon\n", inline=False)
 
