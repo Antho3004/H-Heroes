@@ -226,7 +226,7 @@ class Battle(commands.Cog):
             reward_amount = random.randint(1000, 2000)
         elif rand_num < (argent_chance + training_chance):
             reward_type = "Packs Training"
-            reward_amount = random.randint(1, 3)
+            reward_amount = random.randint(3, 5)
 
         # Appliquer la récompense
         if reward_type and reward_amount is not None:
