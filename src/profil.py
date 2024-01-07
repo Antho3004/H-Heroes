@@ -78,17 +78,17 @@ class Profil(commands.Cog):
 
             if heroes_points == 0:
                 ranked = "unranked"
-            elif heroes_points > 1 and heroes_points <= 2000:
+            elif heroes_points >= 1 and heroes_points < 2000:
                 ranked = "Bronze"
-            elif heroes_points > 2000 and heroes_points <= 4000:
+            elif heroes_points >= 2000 and heroes_points < 4000:
                 ranked = "Silver"
-            elif heroes_points > 4000 and heroes_points <= 6000:
+            elif heroes_points >= 4000 and heroes_points < 6000:
                 ranked = "Gold"
-            elif heroes_points > 6000 and heroes_points <=8000:
+            elif heroes_points >= 6000 and heroes_points < 8000:
                 ranked = "Platinum"
-            elif heroes_points > 8000 and heroes_points <=1000000:
+            elif heroes_points >= 8000 and heroes_points < 1000000:
                 ranked = "Diamond"
-            elif heroes_points > 1000000:
+            elif heroes_points >= 1000000:
                 ranked = "Heroes"
 
         else:

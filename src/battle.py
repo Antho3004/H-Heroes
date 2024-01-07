@@ -290,17 +290,17 @@ class Battle(commands.Cog):
 
         if user_stats[5] == 0:
             ranked = "unranked"
-        elif user_stats[5] > 1 and user_stats[5] <= 1000:
+        elif user_stats[5] >= 1 and user_stats[5] < 2000:
             ranked = "Bronze"
-        elif user_stats[5] > 1000 and user_stats[5] <= 2000:
+        elif user_stats[5] >= 2000 and user_stats[5] < 4000:
             ranked = "Silver"
-        elif user_stats[5] > 2000 and user_stats[5] <= 3000:
+        elif user_stats[5] >= 4000 and user_stats[5] < 6000:
             ranked = "Gold"
-        elif user_stats[5] > 3000 and user_stats[5] <=4000:
+        elif user_stats[5] >= 6000 and user_stats[5] < 8000:
             ranked = "Platinum"
-        elif user_stats[5] > 4000 and user_stats[5] <=5000:
+        elif user_stats[5] >= 8000 and user_stats[5] < 1000000:
             ranked = "Diamond"
-        elif user_stats[5] > 5000:
+        elif user_stats[5] >= 1000000:
             ranked = "Heroes"
 
         # Créer l'embed avec les statistiques
@@ -367,17 +367,17 @@ class Battle(commands.Cog):
 
                 if user[1] == 0:
                     ranked = "unranked"
-                elif user[1] > 0 and user[1] <= 2000:
+                elif user[1] >= 1 and user[1] < 2000:
                     ranked = "Bronze"
-                elif user[1] > 2000 and user[1] <= 4000:
+                elif user[1] >= 2000 and user[1] < 4000:
                     ranked = "Silver"
-                elif user[1] > 4000 and user[1] <= 6000:
+                elif user[1] >= 4000 and user[1] < 6000:
                     ranked = "Gold"
-                elif user[1] > 6000 and user[1] <= 8000:
+                elif user[1] >= 6000 and user[1] < 8000:
                     ranked = "Platinum"
-                elif user[1] > 8000 and user[1] <= 1000000:
+                elif user[1] >= 8000 and user[1] < 1000000:
                     ranked = "Diamond"
-                elif user[1] > 1000000:
+                elif user[1] >= 1000000:
                     ranked = "Heroes"
 
                 if position == 1:
