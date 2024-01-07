@@ -18,7 +18,7 @@ async def weekly_reward_ranked():
     users_hp_sorted = sorted(reward_users_hp, key=lambda x: x[1], reverse=True)
 
     # Définir les récompenses en packs training
-    rewards = [30, 25, 23, 20, 18, 15, 10, 7, 5, 3]
+    rewards = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
 
     # Attribuer les récompenses aux 10 premiers utilisateurs
     for i in range(min(10, len(users_hp_sorted))):
@@ -367,17 +367,17 @@ class Battle(commands.Cog):
 
                 if user[1] == 0:
                     ranked = "unranked"
-                elif user[1] > 0 and user[1] <= 1000:
+                elif user[1] > 0 and user[1] <= 2000:
                     ranked = "Bronze"
-                elif user[1] > 1000 and user[1] <= 2000:
+                elif user[1] > 2000 and user[1] <= 4000:
                     ranked = "Silver"
-                elif user[1] > 2000 and user[1] <= 3000:
+                elif user[1] > 4000 and user[1] <= 6000:
                     ranked = "Gold"
-                elif user[1] > 3000 and user[1] <= 4000:
+                elif user[1] > 6000 and user[1] <= 8000:
                     ranked = "Platinum"
-                elif user[1] > 4000 and user[1] <= 5000:
+                elif user[1] > 8000 and user[1] <= 1000000:
                     ranked = "Diamond"
-                elif user[1] > 5000:
+                elif user[1] > 1000000:
                     ranked = "Heroes"
 
                 if position == 1:
