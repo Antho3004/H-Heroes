@@ -226,7 +226,7 @@ class Battle(commands.Cog):
             reward_amount = random.randint(1000, 2000)
         elif rand_num < (argent_chance + training_chance):
             reward_type = "Packs Training"
-            reward_amount = 5
+            reward_amount = random.randint(1, 3)
 
         # Appliquer la récompense
         if reward_type and reward_amount is not None:
@@ -236,6 +236,9 @@ class Battle(commands.Cog):
                 cursor.execute("UPDATE user_data SET training = training + ? WHERE user_id = ?", (reward_amount, winner_id))
 
             connection.commit()
+        
+        # Ajouter la récompense à l'embed
+        winner_embed.add_field(name="Reward earned", value=f"{reward_type} : **{reward_amount}** and you won **{hp_win}** Heroes Points", inline=False)
 
         return winner_embed
 
