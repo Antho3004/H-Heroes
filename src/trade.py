@@ -97,7 +97,35 @@ class Trade(commands.Cog):
         updated_amount = cursor.fetchone()[0]
         uptated_formatted_amount = self.format_money(updated_amount)
 
-        embed = discord.Embed(description=f"You gave **{amount}** <:HCoins:1134169003657547847> to {user.mention}!\n\nNew balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
+        embed = discord.Embed(title=f"Give Money - {ctx.author.display_name}", description=f"You gave **{amount}** <:HCoins:1134169003657547847> to {user.mention}!\n\nNew balance : **{uptated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def gift_pack(self, ctx, user: discord.User, pack_rarity: str, amount: int = 1):
+
+        # Vérifier si la rareté du pack est valide
+        if pack_rarity.lower() not in ["bronze", "silver", "gold", "legendary", "training"]:
+            embed = discord.Embed(title=f"Invalid Packs - {ctx.author.display_name}", description="Invalid pack rarity. Available rarities: bronze, silver, gold, legendary, training", color=discord.Color.red())
+            await ctx.send(embed=embed)
+            return
+        
+        cursor.execute(f"SELECT {pack_rarity.lower()} FROM user_data WHERE user_id = ?", (ctx.author.id,))
+        pack = cursor.fetchone()
+
+        if pack[0] < amount:
+            embed = discord.Embed(title=f"Gift Packs - {ctx.author.display_name}", description=f"You don't have enough packs {pack_rarity} in your inventory", color=discord.Color.red())
+            await ctx.send(embed=embed)
+            return
+        
+        # Diminuer le pack à l'inventaire de l'utilisateur
+        cursor.execute(f"UPDATE user_data SET {pack_rarity.lower()} = {pack_rarity.lower()} - ? WHERE user_id = ?", (amount, ctx.author.id))
+        connection.commit()
+
+        # Ajouter le pack à l'inventaire de l'utilisateur spécifié
+        cursor.execute(f"UPDATE user_data SET {pack_rarity.lower()} = {pack_rarity.lower()} + ? WHERE user_id = ?", (amount, user.id))
+        connection.commit()
+
+        embed = discord.Embed(title=f"Gift Packs - {ctx.author.display_name}", description=f"You gave **{amount}** packs {pack_rarity} to {user.mention}", color=discord.Color.green())
         await ctx.send(embed=embed)
     
     @commands.command()
