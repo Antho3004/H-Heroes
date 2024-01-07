@@ -40,7 +40,7 @@ class Battle(commands.Cog):
         self.user_wins = 0
         self.opponent_wins = 0
         self.scheduler = AsyncIOScheduler()
-        self.scheduler.add_job(weekly_reward_ranked, trigger="cron", day_of_week="fru", hour=18, minute=00, second=0)
+        self.scheduler.add_job(weekly_reward_ranked, trigger="cron", day_of_week="fri", hour=18, minute=00, second=0)
         self.scheduler.start()
 
     def cog_unload(self):
