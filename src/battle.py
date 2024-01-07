@@ -18,14 +18,14 @@ async def weekly_reward_ranked():
     users_hp_sorted = sorted(reward_users_hp, key=lambda x: x[1], reverse=True)
 
     # Définir les récompenses en packs training
-    rewards = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10]
+    rewards = [100000, 90000, 80000, 70000, 60000, 50000, 40000, 30000, 20000, 10000]
 
     # Attribuer les récompenses aux 10 premiers utilisateurs
     for i in range(min(10, len(users_hp_sorted))):
         user_id, _ = users_hp_sorted[i]
         reward = rewards[i]
 
-        cursor.execute("UPDATE user_data SET training = training + ? WHERE user_id = ?", (reward, user_id))
+        cursor.execute("UPDATE user_data SET argent = argent + ? WHERE user_id = ?", (reward, user_id))
 
     # N'oublie pas de valider et de commit tes changements
     connection.commit()
@@ -118,20 +118,17 @@ class Battle(commands.Cog):
                 round_winner = ctx.author.id
                 winning_card_name = user_card[3]  # Nom de la carte gagnante
                 cursor.execute("UPDATE user_data SET round_win = round_win + ? WHERE user_id = ?", (1, ctx.author.id))
-                cursor.execute("UPDATE user_data SET round_lose = round_lose + ? WHERE user_id = ?", (1, opponent_user_id))
                 connection.commit()
             elif user_stat_category < opponent_stat_category:
                 round_winner = opponent_user_id
                 winning_card_name = opponent_card[3]  # Nom de la carte gagnante
                 cursor.execute("UPDATE user_data SET round_lose = round_lose + ? WHERE user_id = ?", (1, ctx.author.id))
-                cursor.execute("UPDATE user_data SET round_win = round_win + ? WHERE user_id = ?", (1, opponent_user_id))
                 connection.commit()
             else:
                 # En cas d'égalité, vous pouvez définir une logique spécifique
                 round_winner = "égalité"
                 winning_card_name = "Nobody"
                 cursor.execute("UPDATE user_data SET round_equal = round_equal + ? WHERE user_id = ?", (1, ctx.author.id))
-                cursor.execute("UPDATE user_data SET round_equal = round_equal + ? WHERE user_id = ?", (1, opponent_user_id))
                 connection.commit()
 
             # Incrémentation du score du vainqueur
@@ -166,13 +163,9 @@ class Battle(commands.Cog):
         if winner_id == ctx.author.id:
             cursor.execute("UPDATE user_data SET battle_win = battle_win + ? WHERE user_id = ?", (1, ctx.author.id))
             connection.commit()
-            cursor.execute("UPDATE user_data SET battle_lose = battle_lose + ? WHERE user_id = ?", (1, opponent_user_id))
-            connection.commit()
             result_embed = self.create_winner_embed(ctx, winner_id, loser_id)
         elif loser_id == ctx.author.id:
             cursor.execute("UPDATE user_data SET battle_lose = battle_lose + ? WHERE user_id = ?", (1, ctx.author.id))
-            connection.commit()
-            cursor.execute("UPDATE user_data SET battle_win = battle_win + ? WHERE user_id = ?", (1, opponent_user_id))
             connection.commit()
             result_embed = self.create_loser_embed(ctx, winner_id, loser_id)
         else :
@@ -217,11 +210,6 @@ class Battle(commands.Cog):
         cursor.execute("UPDATE user_data SET Heroes_points = Heroes_points + ? WHERE user_id = ?", (hp_win, winner_id))
         connection.commit()
 
-        # Réduire les points de héros en cas de défaite
-        hp_loss = random.randint(20, 25)  # Vous pouvez ajuster ces valeurs selon vos besoins
-        cursor.execute("UPDATE user_data SET Heroes_points = MAX(0, Heroes_points - ?) WHERE user_id = ?", (hp_loss, loser_id))
-        connection.commit()
-
         # Ajouter des informations sur la récompense gagnée
         reward_type = None
         reward_amount = None
@@ -235,10 +223,10 @@ class Battle(commands.Cog):
 
         if rand_num < argent_chance:
             reward_type = "Money"
-            reward_amount = random.randint(3000, 5000)
+            reward_amount = random.randint(1000, 2000)
         elif rand_num < (argent_chance + training_chance):
             reward_type = "Packs Training"
-            reward_amount = 10
+            reward_amount = 5
 
         # Appliquer la récompense
         if reward_type and reward_amount is not None:
@@ -249,26 +237,18 @@ class Battle(commands.Cog):
 
             connection.commit()
 
-            # Ajouter la récompense à l'embed
-            winner_embed.add_field(name="Reward earned", value=f"{reward_type} : **{reward_amount}** and you won **{hp_win}** Heroes Points\nYou made your opponent lose **{hp_loss}** Heroes Points", inline=False)
-
         return winner_embed
 
     def create_loser_embed(self, ctx, winner_id, loser_id):
 
         # Réduire les points de héros en cas de défaite
-        hp_loss = random.randint(20, 25)  # Vous pouvez ajuster ces valeurs selon vos besoins
+        hp_loss = random.randint(20, 24)  # Vous pouvez ajuster ces valeurs selon vos besoins
         cursor.execute("UPDATE user_data SET Heroes_points = MAX(0, Heroes_points - ?) WHERE user_id = ?", (hp_loss, loser_id))
-        connection.commit()
-
-        # Ajouter les points de héros à l'adversaire
-        hp_win = random.randint(20, 30)  # Vous pouvez ajuster ces valeurs selon vos besoins
-        cursor.execute("UPDATE user_data SET Heroes_points = Heroes_points + ? WHERE user_id = ?", (hp_loss, winner_id))
         connection.commit()
         
         loser_embed = discord.Embed(title=f"Battle result - {ctx.author.display_name}", color=discord.Colour.red())
         loser_embed.add_field(name="Defeat...", value=f"Sad <@{loser_id}> you lost {self.user_wins} - {self.opponent_wins} against <@{winner_id}>", inline=False)
-        loser_embed.add_field(name="Lost awards", value=f"You lost **{hp_loss}** Heroes Points\nYou have won your opponent **{hp_win}** points", inline=False)
+        loser_embed.add_field(name="Lost awards", value=f"You lost **{hp_loss}** Heroes Points", inline=False)
         return loser_embed
     
     @commands.command()
