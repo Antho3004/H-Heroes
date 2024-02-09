@@ -71,7 +71,7 @@ class Inventaire(commands.Cog):
                                 "R": "<:NY_Confetti:1185996235551805470>",
                                 "L": "<:NY_Fireworks:1185996232477384808>"
                             }
-                        elif line[4] and line[4].lower() == 'lunar 2024':
+                        elif line[4] and line[4].lower() == 'lunar2024':
                             rarity_emojis = {
                                 "L": "<:Hongbao:1205276514443067533>"
                             }

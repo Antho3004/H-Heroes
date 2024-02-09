@@ -114,7 +114,7 @@ class Lock(commands.Cog):
                             "R": "<:NY_Confetti:1185996235551805470>",
                             "L": "<:NY_Fireworks:1185996232477384808>"
                         }
-                    elif line[12] and line[12].lower() == 'lunar 2024':
+                    elif line[12] and line[12].lower() == 'lunar2024':
                         rarity_emojis = {
                             "L": "<:Hongbao:1205276514443067533>"
                         }

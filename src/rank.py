@@ -50,7 +50,7 @@ class Rank(commands.Cog):
                         "R": "<:NY_Confetti:1185996235551805470>",
                         "L": "<:NY_Fireworks:1185996232477384808>"
                     }
-                elif card[4] and card[4].lower() == 'lunar 2024':
+                elif card[4] and card[4].lower() == 'lunar2024':
                     rarity_emojis = {
                         "L": "<:Hongbao:1185996232477384808>"
                     }
@@ -109,7 +109,7 @@ class Rank(commands.Cog):
                         "R": "<:NY_Confetti:1185996235551805470>",
                         "L": "<:NY_Fireworks:1185996232477384808>"
                     }
-                elif card[5] and card[5].lower() == 'lunar 2024':
+                elif card[5] and card[5].lower() == 'lunar2024':
                     rarity_emojis = {
                         "L": "<:Hongbao:1205276514443067533>"
                     }
