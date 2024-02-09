@@ -11,7 +11,7 @@ class Rank(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def rank_stats(self, ctx, member: discord.Member = None):
+    async def rank_cards(self, ctx, member: discord.Member = None):
         user_id = member.id if member else ctx.author.id
         user_name = member.name if member else ctx.author.name
 
@@ -50,6 +50,10 @@ class Rank(commands.Cog):
                         "R": "<:NY_Confetti:1185996235551805470>",
                         "L": "<:NY_Fireworks:1185996232477384808>"
                     }
+                elif card[4] and card[4].lower() == 'lunar 2024':
+                    rarity_emojis = {
+                        "L": "<:Hongbao:1185996232477384808>"
+                    }
                 else:
                     rarity_emojis = {
                         "C": "<:C_:1107771999490686987>",
@@ -68,7 +72,7 @@ class Rank(commands.Cog):
         await paginator.start(ctx)
     
     @commands.command()
-    async def rank_stats_global(self, ctx):
+    async def lb_cards(self, ctx):
 
         # Récupérer les cartes de l'utilisateur depuis la base de données
         cursor.execute("SELECT user_id, nom, groupe, code_card, rarete, event, chant, dance, rap, acting, modeling FROM user_inventaire")
@@ -105,6 +109,10 @@ class Rank(commands.Cog):
                         "R": "<:NY_Confetti:1185996235551805470>",
                         "L": "<:NY_Fireworks:1185996232477384808>"
                     }
+                elif card[5] and card[5].lower() == 'lunar 2024':
+                    rarity_emojis = {
+                        "L": "<:Hongbao:1205276514443067533>"
+                    }
                 else:
                     rarity_emojis = {
                         "C": "<:C_:1107771999490686987>",
@@ -123,7 +131,7 @@ class Rank(commands.Cog):
         await paginator.start(ctx)
         
     @commands.command()
-    async def rank_teams(self, ctx):
+    async def team_rank(self, ctx):
         # Récupérer les équipes depuis la base de données
         cursor.execute("SELECT user_id, team_name, code_card1, code_card2, code_card3, code_card4, code_card5 FROM team")
         teams_data = cursor.fetchall()

@@ -10,7 +10,7 @@ class Preview(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def preview(self, ctx, code_card: str):
+    async def show(self, ctx, code_card: str):
         user = ctx.author
 
         cursor.execute("SELECT * FROM cards WHERE code_card = ?", (code_card,))

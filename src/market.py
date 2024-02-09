@@ -44,6 +44,10 @@ class MarketPlace(commands.Cog):
                                     "R": "<:NY_Confetti:1185996235551805470>",
                                     "L": "<:NY_Fireworks:1185996232477384808>"
                                 }
+                            elif line[6] and line[6].lower() == 'lunar 2024':
+                                rarity_emojis = {
+                                    "L": "<:Hongbao:1205276514443067533>"
+                                }
                             else:
                                 rarity_emojis = {
                                     "C": "<:C_:1107771999490686987>",
@@ -93,6 +97,15 @@ class MarketPlace(commands.Cog):
                                 rarity_emojis = {
                                     "U": "<:xmas_boot:1183911398661693631>",
                                     "L": "<:xmas_hat:1183911360808112160>"
+                                }
+                            elif line[6] and line[6].lower() == 'new year 2024':
+                                rarity_emojis = {
+                                    "R": "<:NY_Confetti:1185996235551805470>",
+                                    "L": "<:NY_Fireworks:1185996232477384808>"
+                                }
+                            elif line[6] and line[6].lower() == 'lunar 2024':
+                                rarity_emojis = {
+                                    "L": "<:Hongbao:1205276514443067533>"
                                 }
                             else:
                                 rarity_emojis = {

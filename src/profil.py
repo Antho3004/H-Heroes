@@ -86,9 +86,9 @@ class Profil(commands.Cog):
                 ranked = "Gold"
             elif heroes_points >= 6000 and heroes_points < 8000:
                 ranked = "Platinum"
-            elif heroes_points >= 8000 and heroes_points < 1000000:
+            elif heroes_points >= 8000 and heroes_points < 10000:
                 ranked = "Diamond"
-            elif heroes_points >= 1000000:
+            elif heroes_points >= 10000:
                 ranked = "Heroes"
 
         else:
@@ -119,7 +119,7 @@ class Profil(commands.Cog):
 
         await self.show_profile(ctx, user)
 
-    @commands.command()
+    @commands.command(aliases=['desc'])
     async def description(self, ctx, *, new_description):
         user = ctx.author
 

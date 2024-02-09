@@ -66,7 +66,7 @@ class Trade(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.command()
-    async def bal_give(self, ctx, user: discord.Member = None, amount: int = None):
+    async def pay(self, ctx, user: discord.Member = None, amount: int = None):
         if user is None:
             user = ctx.author
 

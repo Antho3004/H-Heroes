@@ -69,7 +69,7 @@ class Work(commands.Cog):
     def cog_unload(self):
         self.scheduler.shutdown()
 
-    @commands.command()
+    @commands.command(aliases=['w'])
     @has_favorite_card()
     @commands.cooldown(1, 1200, commands.BucketType.user)
     async def work(self, ctx):

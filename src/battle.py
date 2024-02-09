@@ -255,7 +255,7 @@ class Battle(commands.Cog):
         return loser_embed
     
     @commands.command()
-    async def battle_stats(self, ctx, member: discord.Member = None):
+    async def stats(self, ctx, member: discord.Member = None):
         if member is None:
             user_id = ctx.author.id
             user_display_name = ctx.author.display_name
@@ -281,9 +281,9 @@ class Battle(commands.Cog):
             ranked = "Gold"
         elif user_stats[5] >= 6000 and user_stats[5] < 8000:
             ranked = "Platinum"
-        elif user_stats[5] >= 8000 and user_stats[5] < 1000000:
+        elif user_stats[5] >= 8000 and user_stats[5] < 10000:
             ranked = "Diamond"
-        elif user_stats[5] >= 1000000:
+        elif user_stats[5] >= 10000:
             ranked = "Heroes"
 
         # Créer l'embed avec les statistiques
@@ -293,7 +293,7 @@ class Battle(commands.Cog):
         await ctx.send(embed=stats_embed)
     
     @commands.command()
-    async def battle_stats_global(self, ctx):
+    async def gstats(self, ctx):
 
         # Récupérer les cartes de l'utilisateur depuis la base de données
         cursor.execute("SELECT user_id, battle_win, battle_lose FROM user_data")
@@ -330,8 +330,8 @@ class Battle(commands.Cog):
         paginator = Paginator(embeds)
         await paginator.start(ctx)
     
-    @commands.command()
-    async def ranked(self, ctx):
+    @commands.command(aliases=['lb'])
+    async def leaderboard(self, ctx):
         # Récupérer les cartes de l'utilisateur depuis la base de données
         cursor.execute("SELECT user_id, Heroes_points FROM user_data")
         user_hp = cursor.fetchall()
@@ -358,9 +358,9 @@ class Battle(commands.Cog):
                     ranked = "Gold"
                 elif user[1] >= 6000 and user[1] < 8000:
                     ranked = "Platinum"
-                elif user[1] >= 8000 and user[1] < 1000000:
+                elif user[1] >= 8000 and user[1] < 10000:
                     ranked = "Diamond"
-                elif user[1] >= 1000000:
+                elif user[1] >= 10000:
                     ranked = "Heroes"
 
                 if position == 1:

@@ -11,7 +11,7 @@ class Team(commands.Cog):
         self.bot = bot
     
     @commands.command()
-    async def create_team(self, ctx, team_name, code_card1, code_card2, code_card3, code_card4, code_card5):
+    async def make_team(self, ctx, team_name, code_card1, code_card2, code_card3, code_card4, code_card5):
         user_id = ctx.author.id
 
         # Check if the user provided exactly 5 unique cards
@@ -64,7 +64,7 @@ class Team(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.command()
-    async def delete_team(self, ctx, team_name):
+    async def remove_team(self, ctx, team_name):
         user_id = ctx.author.id
 
         # Check if the specified team name exists for the user
@@ -124,7 +124,7 @@ class Team(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def team(self, ctx, member: discord.Member = None):
+    async def teams(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
 
@@ -168,7 +168,7 @@ class Team(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def team_view(self, ctx, team_name):
+    async def team_stats(self, ctx, team_name):
         
         # Fetch user information from the 'team' table
         cursor.execute("""
@@ -244,6 +244,10 @@ class Team(commands.Cog):
             return {
                 "R": "<:NY_Confetti:1185996235551805470>",
                 "L": "<:NY_Fireworks:1185996232477384808>"
+            }.get(rarity, "")
+        elif event and event.lower() == 'lunar 2024':
+            return {
+                "L": "<:Hongbao:1205276514443067533>"
             }.get(rarity, "")
         else:
             return {

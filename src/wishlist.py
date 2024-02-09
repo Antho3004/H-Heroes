@@ -97,7 +97,7 @@ class Wishlist(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def wish_view(self, ctx, member: discord.Member = None):
+    async def wishlist(self, ctx, member: discord.Member = None):
         user_id = member.id if member else ctx.author.id
         user_name = member.name if member else ctx.author.name
 

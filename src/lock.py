@@ -87,7 +87,7 @@ class Lock(commands.Cog):
             await ctx.send(embed=embed_fail)
 
     @commands.command()
-    async def lock_view(self, ctx, member: discord.Member = None):  # Ajout du paramètre "member"
+    async def locklist(self, ctx, member: discord.Member = None):  # Ajout du paramètre "member"
         if member is None:
             member = ctx.author  # Utilisateur par défaut : l'auteur du message
 
@@ -114,6 +114,10 @@ class Lock(commands.Cog):
                             "R": "<:NY_Confetti:1185996235551805470>",
                             "L": "<:NY_Fireworks:1185996232477384808>"
                         }
+                    elif line[12] and line[12].lower() == 'lunar 2024':
+                        rarity_emojis = {
+                            "L": "<:Hongbao:1205276514443067533>"
+                        }
                     else:
                         rarity_emojis = {
                             "C": "<:C_:1107771999490686987>",
@@ -134,8 +138,6 @@ class Lock(commands.Cog):
         else:
             embed_no_locked_cards = Embed(title="Locked cards", description="No card is currently locked.", color=discord.Color.blue())
             await ctx.send(embed=embed_no_locked_cards)
-
-
 
 async def setup(bot):
     await bot.add_cog(Lock(bot))

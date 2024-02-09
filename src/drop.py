@@ -27,7 +27,7 @@ class Drop(commands.Cog):
             374658090693427202: [("Dahyun", "TWICE"), ("SOOBIN", "TXT"), ("Felix", "Stray kids")], # Faeclyn
             } 
 
-    @commands.command()
+    @commands.command(aliases=['dr'])
     @commands.cooldown(1, 120, commands.BucketType.user)
     async def drop(self, ctx):
         user_id = ctx.author.id
@@ -65,7 +65,7 @@ class Drop(commands.Cog):
             await ctx.send(embed=embed)
 
         # Requête pour vérifier s'il y a des cartes disponibles de la rareté déterminée
-        cursor.execute("SELECT code_card FROM cards WHERE rarete = ?", (rarity))
+        cursor.execute("SELECT code_card FROM cards WHERE rarete = ?", (rarity,))
         available_cards = cursor.fetchall()
 
         if not available_cards:
@@ -160,6 +160,10 @@ class Drop(commands.Cog):
                 rarity_emojis = {
                     "R": "<:NY_Confetti:1185996235551805470>",
                     "L": "<:NY_Fireworks:1185996232477384808>"
+                }
+            elif event and event.lower() == 'lunar 2024':
+                rarity_emojis = {
+                    "L": "<:Hongbao:1205276514443067533>"
                 }
             else:
                 rarity_emojis = {
