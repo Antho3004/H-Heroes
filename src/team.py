@@ -249,6 +249,11 @@ class Team(commands.Cog):
             return {
                 "L": "<:Hongbao:1205276514443067533>"
             }.get(rarity, "")
+        elif event and event.lower() == 'valentine 2024':
+            return {
+                "U": "<:Flowers:1207807685215391775>",
+                "E": "<:Arc:1207807149531729971>"
+            }.get(rarity, "")
         else:
             return {
                 "C": "<:C_:1107771999490686987>",

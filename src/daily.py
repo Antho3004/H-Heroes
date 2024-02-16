@@ -161,6 +161,11 @@ class Daily(commands.Cog):
                 rarity_emojis = {
                     "L": "<:Hongbao:1205276514443067533>"
                 }
+            elif event and event.lower() == 'valentine 2024':
+                rarity_emojis = {
+                    "U": "<:Flowers:1207807685215391775>",
+                    "E": "<:Arc:1207807149531729971>"
+                }
             else:
                 rarity_emojis = {
                     "C": "<:C_:1107771999490686987>",

@@ -69,7 +69,7 @@ class Drop(commands.Cog):
         available_cards = cursor.fetchall()
 
         if not available_cards:
-            await ctx.send("Si vous voyez ce message ça veut dire que c'est pas normal")
+            await ctx.send("N'hésitez pas à stan Loona, Monsta X, Woo!ah! et WJSN :clown:")
             return
 
         # Requête pour obtenir une carte aléatoire de la rareté déterminée
@@ -164,6 +164,11 @@ class Drop(commands.Cog):
             elif event and event.lower() == 'lunar2024':
                 rarity_emojis = {
                     "L": "<:Hongbao:1205276514443067533>"
+                }
+            elif event and event.lower() == 'valentine 2024':
+                rarity_emojis = {
+                    "U": "<:Flowers:1207807685215391775>",
+                    "E": "<:Arc:1207807149531729971>"
                 }
             else:
                 rarity_emojis = {

@@ -48,6 +48,11 @@ class MarketPlace(commands.Cog):
                                 rarity_emojis = {
                                     "L": "<:Hongbao:1205276514443067533>"
                                 }
+                            elif line[6] and line[6].lower() == 'valentine 2024':
+                                rarity_emojis = {
+                                    "U": "<:Flowers:1207807685215391775>",
+                                    "E": "<:Arc:1207807149531729971>"
+                                }
                             else:
                                 rarity_emojis = {
                                     "C": "<:C_:1107771999490686987>",
@@ -106,6 +111,11 @@ class MarketPlace(commands.Cog):
                             elif line[6] and line[6].lower() == 'lunar2024':
                                 rarity_emojis = {
                                     "L": "<:Hongbao:1205276514443067533>"
+                                }
+                            elif line[6] and line[6].lower() == 'valentine 2024':
+                                rarity_emojis = {
+                                    "U": "<:Flowers:1207807685215391775>",
+                                    "E": "<:Arc:1207807149531729971>"
                                 }
                             else:
                                 rarity_emojis = {
