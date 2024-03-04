@@ -69,7 +69,7 @@ class Drop(commands.Cog):
         available_cards = cursor.fetchall()
 
         if not available_cards:
-            await ctx.send("N'hésitez pas à stan Loona, Monsta X, Woo!ah! et WJSN :clown:")
+            await ctx.send("N'hésitez pas à stream Diamond de TRI.BE :clown:")
             return
 
         # Requête pour obtenir une carte aléatoire de la rareté déterminée
@@ -169,6 +169,14 @@ class Drop(commands.Cog):
                 rarity_emojis = {
                     "U": "<:Flowers:1207807685215391775>",
                     "E": "<:Arc:1207807149531729971>"
+                }
+            elif event and event.lower() == 'k-drama':
+                rarity_emojis = {
+                    "C": "<:C_:1107771999490686987>",
+                    "U": "<:U_:1107772008193867867>",
+                    "R": "<:R_:1107772004410601553>",
+                    "E": "<:E_:1107772001747222550>",
+                    "L": "<:L_:1107772002690945055>"
                 }
             else:
                 rarity_emojis = {

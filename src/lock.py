@@ -44,7 +44,7 @@ class Lock(commands.Cog):
             await ctx.send(embed=embed_already_locked)
 
         if unsuccessful_locks:
-            fail_message = f"Cartes non trouvées : `{', '.join(unsuccessful_locks)}`"
+            fail_message = f"cards not found : `{', '.join(unsuccessful_locks)}`"
             embed_fail = Embed(title="Locked card", description=fail_message, color=discord.Color.red())
             await ctx.send(embed=embed_fail)
 
