@@ -27,14 +27,13 @@ class Inventaire(commands.Cog):
             # Filtrer par event
             cursor.execute(f"SELECT COUNT(*) FROM user_inventaire WHERE user_id = ? AND LOWER(event) = ?", (str(user.id), filter_value))
         elif filter_type == "issue":
-            # Filtrer par numéro de série
-            cursor.execute(f"SELECT COUNT(*) FROM user_inventaire WHERE user_id = ? AND SUBSTR(code_card, INSTR(code_card, '-') + 1) = ?", (str(user.id), filter_value))
-        elif filter_type == "max_issue":
-            # Filtrer les numéros de série inférieurs ou égaux
-            cursor.execute(f"SELECT COUNT(*) FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) <= ?", (str(user.id), filter_value))
-        elif filter_type == "min_issue":
-            # Filtrer les numéros de série supérieurs ou égaux
-            cursor.execute(f"SELECT COUNT(*) FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) >= ?", (str(user.id), filter_value))
+            # Filtrer par plage d'issues
+            if '-' in filter_value:
+                issue_range = filter_value.split("-")
+                start_issue, end_issue = map(int, issue_range)
+                cursor.execute(f"SELECT COUNT(*) FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) BETWEEN ? AND ?", (str(user.id), start_issue, end_issue))
+            else:
+                cursor.execute(f"SELECT COUNT(*) FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) = ?", (str(user.id), int(filter_value)))
         else:
             # Pas de filtre, afficher tous les éléments
             cursor.execute(f"SELECT COUNT(*) FROM user_inventaire WHERE user_id = ?", (str(user.id),))
@@ -52,11 +51,12 @@ class Inventaire(commands.Cog):
                 elif filter_type == "event":
                     cursor.execute(f"SELECT code_card, nom, groupe, rarete, event FROM user_inventaire WHERE user_id = ? AND LOWER(event) = ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id), filter_value))
                 elif filter_type == "issue":
-                    cursor.execute(f"SELECT code_card, nom, groupe, rarete, event FROM user_inventaire WHERE user_id = ? AND SUBSTR(code_card, INSTR(code_card, '-') + 1) = ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id), filter_value))
-                elif filter_type == "max_issue":
-                    cursor.execute(f"SELECT code_card, nom, groupe, rarete, event FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) <= ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id), filter_value))
-                elif filter_type == "min_issue":
-                    cursor.execute(f"SELECT code_card, nom, groupe, rarete, event FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) >= ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id), filter_value))
+                    if '-' in filter_value:
+                        issue_range = filter_value.split("-")
+                        start_issue, end_issue = map(int, issue_range)
+                        cursor.execute(f"SELECT code_card, nom, groupe, rarete, event FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) BETWEEN ? AND ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id), start_issue, end_issue))
+                    else:
+                        cursor.execute(f"SELECT code_card, nom, groupe, rarete, event FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) = ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id), int(filter_value)))
             else:
                 cursor.execute(f"SELECT code_card, nom, groupe, rarete, event FROM user_inventaire WHERE user_id = ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (str(user.id),))
 

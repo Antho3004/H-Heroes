@@ -18,17 +18,24 @@ class Burn(commands.Cog):
     async def burn(self, ctx, *, arg: str):
         user_id = ctx.author.id
         total_money_reward = 0  # Variable pour stocker la somme totale d'argent gagnée
-        card_burn = 0 # Variable pour stocker le nombre de carte bruler
+        card_burn = 0 # Variable pour stocker le nombre de carte brûlées
         error_occurred = False  # Indicateur d'erreur
 
         # Vérifiez si l'argument commence par "issue=" pour déterminer si l'utilisateur veut brûler par l'issue ou par le code de la carte
         if arg.startswith("issue="):
             # Extraire la plage d'issues spécifiée par l'utilisateur
             issue_range = arg.split("=")[1]
-            start_issue, end_issue = map(int, issue_range.split('-'))
-            # Mettre en œuvre la logique pour brûler les cartes dans la plage d'issues spécifiée
-            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) BETWEEN ? AND ?", (user_id, start_issue, end_issue))
-            codes_cards = [row[0] for row in cursor.fetchall()]
+            # Si l'issue_range contient un seul chiffre, cela signifie qu'une seule issue est spécifiée
+            if '-' not in issue_range:
+                issue_number = int(issue_range)
+                cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) = ?", (user_id, issue_number))
+                codes_cards = [row[0] for row in cursor.fetchall()]
+            else:
+                # Sinon, une plage d'issues est spécifiée
+                start_issue, end_issue = map(int, issue_range.split('-'))
+                # Mettre en œuvre la logique pour brûler les cartes dans la plage d'issues spécifiée
+                cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) BETWEEN ? AND ?", (user_id, start_issue, end_issue))
+                codes_cards = [row[0] for row in cursor.fetchall()]
         else:
             codes_cards = arg.split()  # Si l'argument ne commence pas par "issue=", supposons que ce sont des codes de carte
 
@@ -111,5 +118,3 @@ class Burn(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(Burn(bot))
-
-
