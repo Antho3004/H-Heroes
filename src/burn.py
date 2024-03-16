@@ -36,6 +36,16 @@ class Burn(commands.Cog):
                 # Mettre en œuvre la logique pour brûler les cartes dans la plage d'issues spécifiée
                 cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER) BETWEEN ? AND ?", (user_id, start_issue, end_issue))
                 codes_cards = [row[0] for row in cursor.fetchall()]
+        elif arg.startswith("group="):
+            # Extraire le nom du groupe spécifié par l'utilisateur
+            group_name = arg.split("=")[1]
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(groupe) = ?", (user_id, group_name.lower()))
+            codes_cards = [row[0] for row in cursor.fetchall()]
+        elif arg.startswith("name="):
+            # Extraire le nom spécifié par l'utilisateur
+            name = arg.split("=")[1]
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(nom) = ?", (user_id, name.lower()))
+            codes_cards = [row[0] for row in cursor.fetchall()]
         else:
             codes_cards = arg.split()  # Si l'argument ne commence pas par "issue=", supposons que ce sont des codes de carte
 
@@ -112,7 +122,6 @@ class Burn(commands.Cog):
             error_occurred = True
 
         if not error_occurred:  # Exécuter seulement si aucune erreur ne s'est produite
-            # Confirmation message in an embed with the total money reward
             embed = Embed(title="Cards Burned Successfully", description=f"You burned **{card_burn}** cards and gained a total of **{total_money_reward}** <:HCoins:1134169003657547847>\n\nNew balance : **{updated_formatted_amount}** <:HCoins:1134169003657547847>", color=discord.Color.green())
             await ctx.send(embed=embed)
 

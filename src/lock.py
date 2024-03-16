@@ -12,12 +12,27 @@ class Lock(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def lock(self, ctx, *code_cards):
+    async def lock(self, ctx, *, arg: str):
         user_id = ctx.author.id
         successful_locks = []
         unsuccessful_locks = []
         already_locked = []
-        for code_card in code_cards:
+        
+        if arg.startswith("group="):
+            # Extraire le nom du groupe spécifié par l'utilisateur
+            group_name = arg.split("=")[1]
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(groupe) = ?", (user_id, group_name.lower()))
+            codes_cards = [row[0] for row in cursor.fetchall()]
+        elif arg.startswith("name="):
+            # Extraire le nom spécifié par l'utilisateur
+            name = arg.split("=")[1]
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(nom) = ?", (user_id, name.lower()))
+            codes_cards = [row[0] for row in cursor.fetchall()]
+        else:
+            # Si l'argument ne commence ni par "group=", ni par "name=", supposons que ce sont des codes de carte
+            codes_cards = arg.split()
+
+        for code_card in codes_cards:
             cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ? and user_id = ?", (code_card, user_id))
             card_data = cursor.fetchone()
 
