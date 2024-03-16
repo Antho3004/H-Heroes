@@ -17,22 +17,28 @@ class Lock(commands.Cog):
         successful_locks = []
         unsuccessful_locks = []
         already_locked = []
-        
+        issue_number = None  # Initialiser la variable issue_number à None
+        cards_to_lock = []  # Initialiser une liste pour stocker les codes des cartes à verrouiller
+
         if arg.startswith("group="):
             # Extraire le nom du groupe spécifié par l'utilisateur
             group_name = arg.split("=")[1]
             cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(groupe) = ?", (user_id, group_name.lower()))
-            codes_cards = [row[0] for row in cursor.fetchall()]
+            cards_to_lock = [row[0] for row in cursor.fetchall()]
         elif arg.startswith("name="):
             # Extraire le nom spécifié par l'utilisateur
             name = arg.split("=")[1]
             cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(nom) = ?", (user_id, name.lower()))
-            codes_cards = [row[0] for row in cursor.fetchall()]
+            cards_to_lock = [row[0] for row in cursor.fetchall()]
+        elif arg.startswith("issue="):  # Vérifier si l'argument spécifie une issue
+            issue_number = arg.split("=")[1]  # Extraire le numéro de l'issue
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND SUBSTR(code_card, INSTR(code_card, '-') + 1) = ?", (user_id, issue_number))
+            cards_to_lock = [row[0] for row in cursor.fetchall()]
         else:
-            # Si l'argument ne commence ni par "group=", ni par "name=", supposons que ce sont des codes de carte
-            codes_cards = arg.split()
+            # Si l'argument ne commence ni par "group=", ni par "name=", ni par "issue=", supposons que ce sont des codes de carte
+            cards_to_lock = arg.split()
 
-        for code_card in codes_cards:
+        for code_card in cards_to_lock:
             cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ? and user_id = ?", (code_card, user_id))
             card_data = cursor.fetchone()
 
@@ -48,8 +54,11 @@ class Lock(commands.Cog):
             else:
                 unsuccessful_locks.append(code_card)
 
-        if successful_locks:
-            success_message = f"Cards successfully locked : `{', '.join(successful_locks)}`"
+        # Nombre de cartes verrouillées
+        num_successful_locks = len(successful_locks)
+
+        if num_successful_locks > 0:
+            success_message = f"**{num_successful_locks}** card(s) successfully locked : `{', '.join(successful_locks)}`"
             embed_success = Embed(title="Locked card", description=success_message, color=discord.Color.green())
             await ctx.send(embed=embed_success)
 
@@ -59,18 +68,39 @@ class Lock(commands.Cog):
             await ctx.send(embed=embed_already_locked)
 
         if unsuccessful_locks:
-            fail_message = f"cards not found : `{', '.join(unsuccessful_locks)}`"
+            num_unsuccessful_locks = len(unsuccessful_locks)
+            fail_message = f"{num_unsuccessful_locks} card(s) not found : `{', '.join(unsuccessful_locks)}`"
             embed_fail = Embed(title="Locked card", description=fail_message, color=discord.Color.red())
             await ctx.send(embed=embed_fail)
 
     @commands.command()
-    async def unlock(self, ctx, *code_cards):
+    async def unlock(self, ctx, *, arg: str):
         user_id = ctx.author.id
         successful_unlocks = []
         unsuccessful_unlocks = []
         already_unlocked = []
+        issue_number = None  # Initialiser la variable issue_number à None
+        cards_to_unlock = []  # Initialiser une liste pour stocker les codes des cartes à déverrouiller
 
-        for code_card in code_cards:
+        if arg.startswith("group="):
+            # Extraire le nom du groupe spécifié par l'utilisateur
+            group_name = arg.split("=")[1]
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(groupe) = ?", (user_id, group_name.lower()))
+            cards_to_unlock = [row[0] for row in cursor.fetchall()]
+        elif arg.startswith("name="):
+            # Extraire le nom spécifié par l'utilisateur
+            name = arg.split("=")[1]
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(nom) = ?", (user_id, name.lower()))
+            cards_to_unlock = [row[0] for row in cursor.fetchall()]
+        elif arg.startswith("issue="):  # Vérifier si l'argument spécifie une issue
+            issue_number = arg.split("=")[1]  # Extraire le numéro de l'issue
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND SUBSTR(code_card, INSTR(code_card, '-') + 1) = ?", (user_id, issue_number))
+            cards_to_unlock = [row[0] for row in cursor.fetchall()]
+        else:
+            # Si l'argument ne commence ni par "group=", ni par "name=", ni par "issue=", supposons que ce sont des codes de carte
+            cards_to_unlock = arg.split()
+
+        for code_card in cards_to_unlock:
             cursor.execute("SELECT * FROM user_inventaire WHERE code_card = ? and user_id = ?", (code_card, user_id))
             card_data = cursor.fetchone()
 
@@ -86,19 +116,23 @@ class Lock(commands.Cog):
             else:
                 unsuccessful_unlocks.append(code_card)
 
-        if successful_unlocks:
-            success_message = f"Cards successfully unlocked : `{', '.join(successful_unlocks)}`"
-            embed_success = Embed(title="Locked card", description=success_message, color=discord.Color.green())
+        # Nombre de cartes déverrouillées
+        num_successful_unlocks = len(successful_unlocks)
+
+        if num_successful_unlocks > 0:
+            success_message = f"**{num_successful_unlocks}** card(s) successfully unlocked : `{', '.join(successful_unlocks)}`"
+            embed_success = Embed(title="Unlocked card", description=success_message, color=discord.Color.green())
             await ctx.send(embed=embed_success)
 
         if already_unlocked:
             already_unlocked_message = f"Cards already unlocked : `{', '.join(already_unlocked)}`"
-            embed_already_unlocked = Embed(title="Locked card", description=already_unlocked_message, color=discord.Color.orange())
+            embed_already_unlocked = Embed(title="Unlocked card", description=already_unlocked_message, color=discord.Color.orange())
             await ctx.send(embed=embed_already_unlocked)
 
         if unsuccessful_unlocks:
-            fail_message = f"Cards not found : `{', '.join(unsuccessful_unlocks)}`"
-            embed_fail = Embed(title="Locked card", description=fail_message, color=discord.Color.red())
+            num_unsuccessful_unlocks = len(unsuccessful_unlocks)
+            fail_message = f"{num_unsuccessful_unlocks} card(s) not found : `{', '.join(unsuccessful_unlocks)}`"
+            embed_fail = Embed(title="Unlocked card", description=fail_message, color=discord.Color.red())
             await ctx.send(embed=embed_fail)
 
     @commands.command()
@@ -106,7 +140,7 @@ class Lock(commands.Cog):
         if member is None:
             member = ctx.author  # Utilisateur par défaut : l'auteur du message
 
-        cursor.execute("SELECT * FROM user_inventaire WHERE lock = ? AND user_id = ? ORDER BY groupe, nom, rarete", (True, member.id))
+        cursor.execute("SELECT * FROM user_inventaire WHERE lock = ? AND user_id = ? ORDER BY groupe, nom, rarete, CAST(SUBSTR(code_card, INSTR(code_card, '-') + 1) AS INTEGER)", (True, member.id))
         locked_cards_data = cursor.fetchall()
 
         cursor.execute("SELECT COUNT(*) FROM user_inventaire WHERE lock = ? AND user_id = ?", (True, member.id))
@@ -146,7 +180,8 @@ class Lock(commands.Cog):
                             "E": "<:E_:1107772001747222550>",
                             "L": "<:L_:1107772002690945055>"
                         }
-                                    # Accéder à la clé correcte du dictionnaire pour obtenir l'emoji de rareté
+                    
+                    # Accéder à la clé correcte du dictionnaire pour obtenir l'emoji de rareté
                     card_name = f"- {line[2]} {line[3]} {rarity_emojis.get(line[4], '')} : `{line[1]}`"
                     embed.add_field(name="", value=card_name, inline=False)
                 
