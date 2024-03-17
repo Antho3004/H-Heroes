@@ -30,6 +30,11 @@ class Lock(commands.Cog):
             name = arg.split("=")[1]
             cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(nom) = ?", (user_id, name.lower()))
             cards_to_lock = [row[0] for row in cursor.fetchall()]
+        elif arg.startswith("event="):
+            # Extraire l'event spécifié par l'utilisateur
+            event = arg.split("=")[1]
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(event) = ?", (user_id, event.lower()))
+            cards_to_lock = [row[0] for row in cursor.fetchall()]
         elif arg.startswith("issue="):  # Vérifier si l'argument spécifie une issue
             issue_number = arg.split("=")[1]  # Extraire le numéro de l'issue
             cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND SUBSTR(code_card, INSTR(code_card, '-') + 1) = ?", (user_id, issue_number))
@@ -92,7 +97,12 @@ class Lock(commands.Cog):
             name = arg.split("=")[1]
             cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(nom) = ?", (user_id, name.lower()))
             cards_to_unlock = [row[0] for row in cursor.fetchall()]
-        elif arg.startswith("issue="):  # Vérifier si l'argument spécifie une issue
+        elif arg.startswith("event="):
+            # Extraire l'event spécifié par l'utilisateur
+            event = arg.split("=")[1]
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(event) = ?", (user_id, event.lower()))
+            cards_to_unlock = [row[0] for row in cursor.fetchall()]
+        elif arg.startswith("issue="):  
             issue_number = arg.split("=")[1]  # Extraire le numéro de l'issue
             cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND SUBSTR(code_card, INSTR(code_card, '-') + 1) = ?", (user_id, issue_number))
             cards_to_unlock = [row[0] for row in cursor.fetchall()]

@@ -46,6 +46,11 @@ class Burn(commands.Cog):
             name = arg.split("=")[1]
             cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(nom) = ?", (user_id, name.lower()))
             codes_cards = [row[0] for row in cursor.fetchall()]
+        elif arg.startswith("event="):
+            # Extraire l'event spécifié par l'utilisateur
+            event = arg.split("=")[1]
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(event) = ?", (user_id, event.lower()))
+            codes_cards = [row[0] for row in cursor.fetchall()]
         else:
             codes_cards = arg.split()  # Si l'argument ne commence pas par "issue=", supposons que ce sont des codes de carte
 
