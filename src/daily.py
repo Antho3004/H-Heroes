@@ -23,8 +23,7 @@ class Daily(commands.Cog):
             929379626558586910: [("Hui", "Pentagon"), ("Mingi", "Ateez"), ("Yeosang", "Ateez")], # Unnilie
             254635682184560641: [("Winter", "aespa"), ("Winter", "GIRLS ON TOP"), ("Ryujin", "Itzy"), ("Taemin", "Shinee"), ("Taemin", "SOLOISTS")], # Osi
             629238375509000192: [("Yeojun", "TXT"), ("Junho", "2PM"), ("L","INFINITE")], # Lululionne
-            559414465288863745: [("Lisa", "BLACKPINK"), ("Lisa", "SOLOISTS"), ("JIMIN", "BTS"), ("JIMIN", "SOLOISTS"), ("Hyunjin", "Stray kids")], # Akira
-            374658090693427202: [("Dahyun", "TWICE"), ("SOOBIN", "TXT"), ("Felix", "Stray kids")], # Faeclyn
+            374658090693427202: [("Dahyun", "TWICE"), ("Dami", "Dreamcatcher"), ("Na goeun", "Purple Kiss")], # Faeclyn
             } 
     
     def format_money(self, money):

@@ -23,8 +23,7 @@ class Drop(commands.Cog):
             929379626558586910: [("Hui", "Pentagon"), ("Mingi", "Ateez"), ("Yeosang", "Ateez")], # Unnilie
             254635682184560641: [("Winter", "aespa"), ("Winter", "GIRLS ON TOP"), ("Ryujin", "Itzy"), ("Taemin", "Shinee"), ("Taemin", "SOLOISTS")], # Osi
             629238375509000192: [("Yeojun", "TXT"), ("Junho", "2PM"), ("L","INFINITE")], # Lululionne
-            559414465288863745: [("Lisa", "BLACKPINK"), ("Lisa", "SOLOISTS"), ("JIMIN", "BTS"), ("JIMIN", "SOLOISTS"), ("Hyunjin", "Stray kids")], # Akira
-            374658090693427202: [("Dahyun", "TWICE"), ("SOOBIN", "TXT"), ("Felix", "Stray kids")], # Faeclyn
+            374658090693427202: [("Dahyun", "TWICE"), ("Dami", "Dreamcatcher"), ("Na goeun", "Purple Kiss")], # Faeclyn
             } 
 
     @commands.command(aliases=['dr'])
@@ -69,7 +68,7 @@ class Drop(commands.Cog):
         available_cards = cursor.fetchall()
 
         if not available_cards:
-            await ctx.send("N'hésitez pas à stream Diamond de TRI.BE :clown:")
+            await ctx.send("Mais n'hésitez pas à stream Diamond de TRI.BE :clown:")
             return
 
         # Requête pour obtenir une carte aléatoire de la rareté déterminée
