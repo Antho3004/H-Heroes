@@ -254,6 +254,11 @@ class Team(commands.Cog):
                 "U": "<:Flowers:1207807685215391775>",
                 "E": "<:Arc:1207807149531729971>"
             }.get(rarity, "")
+        elif event and event.lower() == 'spring 2024':
+            return {
+                "U": "<:Marigold:1220794525094772806>",
+                "R": "<:Sakura:1220794502944657460>"
+            }.get(rarity, "")
         else:
             return {
                 "C": "<:C_:1107771999490686987>",

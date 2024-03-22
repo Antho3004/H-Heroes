@@ -59,6 +59,11 @@ class Rank(commands.Cog):
                         "U": "<:Flowers:1207807685215391775>",
                         "E": "<:Arc:1207807149531729971>"
                     }
+                elif card[4] and card[4].lower() == 'spring 2024':
+                    rarity_emojis = {
+                        "U": "<:Marigold:1220123121298706519>",
+                        "R": "<:Sakura:1220118527868928092>"
+                    }
                 else:
                     rarity_emojis = {
                         "C": "<:C_:1107771999490686987>",
@@ -122,6 +127,11 @@ class Rank(commands.Cog):
                     rarity_emojis = {
                         "U": "<:Flowers:1207807685215391775>",
                         "E": "<:Arc:1207807149531729971>"
+                    }
+                elif card[5] and card[5].lower() == 'spring 2024':
+                    rarity_emojis = {
+                        "U": "<:Marigold:1220794525094772806>",
+                        "R": "<:Sakura:1220794502944657460>"
                     }
                 else:
                     rarity_emojis = {

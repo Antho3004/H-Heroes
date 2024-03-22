@@ -120,6 +120,11 @@ class Shop(commands.Cog):
                     "U": "<:Flowers:1207807685215391775>",
                     "E": "<:Arc:1207807149531729971>"
                 }
+            elif event_lower == 'spring 2024':
+                rarity_emojis = {
+                    "U": "<:Marigold:1220794525094772806>",
+                    "R": "<:Sakura:1220794502944657460>"
+                }
             elif event_lower == 'k-drama':
                 rarity_emojis = {
                     "C": "<:C_:1107771999490686987>",
@@ -329,7 +334,7 @@ class Shop(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.command()
-    async def training(self, ctx, code_card: str):
+    async def training(self, ctx, code_card: str, number_of_trainings: int=1):
         # Vérifier si l'utilisateur possède des packs_training
         user_id = ctx.author.id
         with sqlite3.connect("HallyuHeroes.db") as connection:
@@ -338,8 +343,8 @@ class Shop(commands.Cog):
             cursor.execute("SELECT training FROM user_data WHERE user_id = ?", (user_id,))
             training_packs = cursor.fetchone()[0] or 0
 
-            if training_packs > 0:
-                # L'utilisateur a des packs_training, procéder à l'amélioration des stats
+            if training_packs >= number_of_trainings:
+                # L'utilisateur a suffisamment de packs_training, procéder à l'amélioration des stats
                 cursor.execute("SELECT rarete, chant, dance, rap, acting, modeling FROM user_inventaire WHERE user_id = ? AND code_card = ?", (user_id, code_card))
                 card_data = cursor.fetchone()
 
@@ -362,35 +367,56 @@ class Shop(commands.Cog):
                         # Liste des statistiques disponibles
                         available_stats = ["chant", "dance", "rap", "acting", "modeling"]
 
-                        # Boucle pour essayer de trouver une statistique à améliorer qui n'a pas dépassé la limite
-                        for _ in range(len(available_stats)):
+                        stats_summary = {}  # Résumé des statistiques améliorées
+
+                        nombre_upgrade = 0
+
+                        for _ in range(number_of_trainings):
+                            # Choisir une statistique à améliorer
                             stat_to_improve = random.choice(available_stats)
-                            current_stat_value = locals()[stat_to_improve]
+                            cursor.execute(f"SELECT {stat_to_improve} FROM user_inventaire WHERE user_id = ? and code_card = ?", (user_id, code_card)) 
+                            current_stat_value = cursor.fetchone()[0]
 
                             # Vérifier si la statistique a déjà dépassé la limite
-                            if current_stat_value < stat_limit:
-                                # Améliorer la statistique
-                                upgrade = random.randint(1, 50)
-                                improved_stat_value = current_stat_value + upgrade
-
-                                # Mettre à jour la base de données avec la nouvelle valeur de la statistique
-                                cursor.execute(f"UPDATE user_inventaire SET {stat_to_improve} = ? WHERE user_id = ? AND code_card = ?", (improved_stat_value, user_id, code_card))
-                                connection.commit()
-
-                                # Décrémenter le nombre de packs_training de l'utilisateur
-                                cursor.execute("UPDATE user_data SET training = training - 1 WHERE user_id = ?", (user_id,))
-                                connection.commit()
-
-                                embed = discord.Embed(title=f"{ctx.author.display_name}'s Training Successful", description=f"You have successfully trained **{stat_to_improve} + {upgrade}** for the card `{code_card}`", color=discord.Color.green())
-                                await ctx.send(embed=embed)
-                                break  # Sortir de la boucle une fois que la statistique a été améliorée
-                            else:
-                                # Retirer la statistique de la liste des statistiques disponibles si elle a déjà dépassé la limite
+                            while current_stat_value >= stat_limit:
+                                # Si la statistique a déjà dépassé la limite, choisir une autre statistique
                                 available_stats.remove(stat_to_improve)
-                        else:
-                            # Cette partie du code est exécutée si la boucle for se termine sans être interrompue par le break
-                            embed = discord.Embed(title=f"All Stats at Limit- {ctx.author.display_name}", description=f"All stats for this card are already at the maximum limit for its rarity ({rarity}).", color=discord.Color.red())
-                            await ctx.send(embed=embed)
+                                
+                                if not available_stats:
+                                    embed = discord.Embed(title=f"All Stats at Limit - {ctx.author.display_name}", description=f"All stats for this card are already at the maximum limit for its rarity ({rarity}).", color=discord.Color.red())
+                                    await ctx.send(embed=embed)
+                                    return
+                                
+                                # on choisi une autre statistics
+                                stat_to_improve = random.choice(available_stats)
+                                cursor.execute(f"SELECT {stat_to_improve} FROM user_inventaire WHERE user_id = ? and code_card = ?", (user_id, code_card)) 
+                                current_stat_value = cursor.fetchone()[0]
+
+                            # Améliorer la statistique
+                            upgrade = random.randint(1, 50)
+                            improved_stat_value = current_stat_value + upgrade
+
+                            # Mettre à jour la base de données avec la nouvelle valeur de la statistique
+                            cursor.execute(f"UPDATE user_inventaire SET {stat_to_improve} = ? WHERE user_id = ? AND code_card = ?", (improved_stat_value, user_id, code_card))
+                            cursor.execute("UPDATE user_data SET training = training - 1 WHERE user_id = ?", (user_id,)) 
+                            connection.commit()
+
+                            nombre_upgrade += 1
+
+                            # Ajouter la statistique améliorée au résumé
+                            stat_name = "sing" if stat_to_improve == "chant" else stat_to_improve
+                            stats_summary[stat_name] = stats_summary.get(stat_name, 0) + upgrade
+                            
+                            # Si la statistique a atteint la limite, la retirer des statistiques disponibles
+                            if improved_stat_value >= stat_limit:
+                                available_stats.remove(stat_to_improve)
+                        
+                        # Construction de l'embed final avec le résumé des statistiques améliorées
+                        embed = discord.Embed(title=f"{ctx.author.display_name}'s Training Result", description=f"Stats successfully increased **{number_of_trainings}** times for the card `{code_card}`", color=discord.Color.green())
+                        for stat, value in stats_summary.items():
+                            embed.add_field(name="", value=f"{stat.capitalize()} : + **{value}**\n", inline=False)
+                        await ctx.send(embed=embed)
+                        
                     else:
                         embed = discord.Embed(title=f"Invalid Rarity - {ctx.author.display_name}", description=f"Invalid rarity ({rarity}) for the card `{code_card}`", color=discord.Color.red())
                         await ctx.send(embed=embed)
@@ -398,9 +424,9 @@ class Shop(commands.Cog):
                     embed = discord.Embed(title=f"Card Not Found - {ctx.author.display_name}", description=f"Card with code `{code_card}` not found in your inventory.", color=discord.Color.red())
                     await ctx.send(embed=embed)
             else:
-                embed = discord.Embed(title=f"No Training Packs - {ctx.author.display_name}", description="You don't have any training packs in your inventory.", color=discord.Color.red())
+                embed = discord.Embed(title=f"Not Enough Training Packs - {ctx.author.display_name}", description=f"You don't have enough training packs in your inventory. You need at least {number_of_trainings} training packs.", color=discord.Color.red())
                 await ctx.send(embed=embed)
-    
+
     @commands.command()
     async def add_pack(self, ctx, user: discord.User, pack_rarity: str, amount: int = 1):
         # Vérifier si l'utilisateur est autorisé

@@ -117,6 +117,11 @@ class MarketPlace(commands.Cog):
                                     "U": "<:Flowers:1207807685215391775>",
                                     "E": "<:Arc:1207807149531729971>"
                                 }
+                            elif line[6] and line[6].lower() == 'spring 2024':
+                                rarity_emojis = {
+                                    "U": "<:Marigold:1220794525094772806>",
+                                    "R": "<:Sakura:1220794502944657460>"
+                                }
                             else:
                                 rarity_emojis = {
                                     "C": "<:C_:1107771999490686987>",

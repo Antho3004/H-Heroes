@@ -58,7 +58,6 @@ class Profil(commands.Cog):
 
             cursor.execute("SELECT Heroes_points FROM user_data WHERE user_id = ?", (str(user.id),))
             heroes_points = cursor.fetchone()[0]
-            print(heroes_points)
 
             cursor.execute("select user_inventaire.image_url from user_data join user_inventaire on user_data.carte_favori = user_inventaire.code_card WHERE user_inventaire.user_id = ?", (str(user.id),))
             img_fav = cursor.fetchone()
