@@ -259,6 +259,10 @@ class Team(commands.Cog):
                 "U": "<:Marigold:1220794525094772806>",
                 "R": "<:Sakura:1220794502944657460>"
             }.get(rarity, "")
+        elif event.lower() == "april fool's day":
+            return {
+                "L": "<:JOKE:1224024439004332142>"
+            }.get(rarity, "")
         else:
             return {
                 "C": "<:C_:1107771999490686987>",

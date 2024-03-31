@@ -27,17 +27,17 @@ class Drop(commands.Cog):
             } 
 
     @commands.command(aliases=['dr'])
-    #@commands.cooldown(1, 120, commands.BucketType.user)
+    @commands.cooldown(1, 120, commands.BucketType.user)
     async def drop(self, ctx):
         user_id = ctx.author.id
 
         # Définir les pourcentages de drop en fonction de la rareté
         rarity_drop_rates = {
-            "C": 0,   # 40% pour les cartes communes (Common)
-            "U": 50,   # 30% pour les cartes peu communes (Uncommon)
-            "R": 50,   # 15% pour les cartes rares (Rare)
-            "E": 0,   # 10% pour les cartes épiques (Epic)
-            "L": 0     # 5% pour les cartes légendaires (Legendary)
+            "C": 40,   # 40% pour les cartes communes (Common)
+            "U": 30,   # 30% pour les cartes peu communes (Uncommon)
+            "R": 15,   # 15% pour les cartes rares (Rare)
+            "E": 10,   # 10% pour les cartes épiques (Epic)
+            "L": 5     # 5% pour les cartes légendaires (Legendary)
         }
 
         # Calculer le pourcentage total de drop (100%)
@@ -68,7 +68,7 @@ class Drop(commands.Cog):
         available_cards = cursor.fetchall()
 
         if not available_cards:
-            await ctx.send("Mais n'hésitez pas à stream Diamond de TRI.BE :clown:")
+            await ctx.send("")
             return
 
         # Requête pour obtenir une carte aléatoire de la rareté déterminée
@@ -173,6 +173,10 @@ class Drop(commands.Cog):
                 rarity_emojis = {
                     "U": "<:Marigold:1220794525094772806>",
                     "R": "<:Sakura:1220794502944657460>"
+                }
+            elif event and event.lower() == "april fool's day":
+                rarity_emojis = {
+                    "L": "<:JOKE:1224024439004332142>"
                 }
             elif event and event.lower() == 'k-drama':
                 rarity_emojis = {

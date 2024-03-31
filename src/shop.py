@@ -125,6 +125,10 @@ class Shop(commands.Cog):
                     "U": "<:Marigold:1220794525094772806>",
                     "R": "<:Sakura:1220794502944657460>"
                 }
+            elif event.lower() == "april fool's day":
+                rarity_emojis = {
+                    "L": "<:JOKE:1224024439004332142>"
+                }
             elif event_lower == 'k-drama':
                 rarity_emojis = {
                     "C": "<:C_:1107771999490686987>",
@@ -369,7 +373,7 @@ class Shop(commands.Cog):
 
                         stats_summary = {}  # Résumé des statistiques améliorées
 
-                        nombre_upgrade = 0
+                        nombre_training = 0
 
                         for _ in range(number_of_trainings):
                             # Choisir une statistique à améliorer
@@ -385,13 +389,17 @@ class Shop(commands.Cog):
                                 if not available_stats:
                                     embed = discord.Embed(title=f"All Stats at Limit - {ctx.author.display_name}", description=f"All stats for this card are already at the maximum limit for its rarity ({rarity}).", color=discord.Color.red())
                                     await ctx.send(embed=embed)
-                                    return
+                                    break
                                 
                                 # on choisi une autre statistics
                                 stat_to_improve = random.choice(available_stats)
                                 cursor.execute(f"SELECT {stat_to_improve} FROM user_inventaire WHERE user_id = ? and code_card = ?", (user_id, code_card)) 
                                 current_stat_value = cursor.fetchone()[0]
 
+                            if current_stat_value >= stat_limit:
+                                    # Sortir de la boucle for si toutes les statistiques ont atteint la limite
+                                    break
+                            
                             # Améliorer la statistique
                             upgrade = random.randint(1, 50)
                             improved_stat_value = current_stat_value + upgrade
@@ -401,7 +409,7 @@ class Shop(commands.Cog):
                             cursor.execute("UPDATE user_data SET training = training - 1 WHERE user_id = ?", (user_id,)) 
                             connection.commit()
 
-                            nombre_upgrade += 1
+                            nombre_training += 1
 
                             # Ajouter la statistique améliorée au résumé
                             stat_name = "sing" if stat_to_improve == "chant" else stat_to_improve
@@ -411,8 +419,9 @@ class Shop(commands.Cog):
                             if improved_stat_value >= stat_limit:
                                 available_stats.remove(stat_to_improve)
                         
+
                         # Construction de l'embed final avec le résumé des statistiques améliorées
-                        embed = discord.Embed(title=f"{ctx.author.display_name}'s Training Result", description=f"Stats successfully increased **{number_of_trainings}** times for the card `{code_card}`", color=discord.Color.green())
+                        embed = discord.Embed(title=f"{ctx.author.display_name}'s Training Result", description=f"Stats successfully increased **{nombre_training}** times for the card `{code_card}`", color=discord.Color.green())
                         for stat, value in stats_summary.items():
                             embed.add_field(name="", value=f"{stat.capitalize()} : + **{value}**\n", inline=False)
                         await ctx.send(embed=embed)
@@ -424,8 +433,10 @@ class Shop(commands.Cog):
                     embed = discord.Embed(title=f"Card Not Found - {ctx.author.display_name}", description=f"Card with code `{code_card}` not found in your inventory.", color=discord.Color.red())
                     await ctx.send(embed=embed)
             else:
+                # Message indiquant que l'utilisateur n'a pas assez de packs
                 embed = discord.Embed(title=f"Not Enough Training Packs - {ctx.author.display_name}", description=f"You don't have enough training packs in your inventory. You need at least {number_of_trainings} training packs.", color=discord.Color.red())
                 await ctx.send(embed=embed)
+
 
     @commands.command()
     async def add_pack(self, ctx, user: discord.User, pack_rarity: str, amount: int = 1):

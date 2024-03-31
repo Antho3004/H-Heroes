@@ -30,7 +30,7 @@ class Daily(commands.Cog):
         return "{:,}".format(money).replace(",", " ")
 
     @commands.command()
-    #@commands.cooldown(1, 86400, commands.BucketType.user)
+    @commands.cooldown(1, 86400, commands.BucketType.user)
     async def daily(self, ctx):
         user_id = ctx.author.id
 
@@ -41,11 +41,11 @@ class Daily(commands.Cog):
             # Récompense de carte
             # Définir les pourcentages de drop en fonction de la rareté
             rarity_drop_rates = {
-                "C": 0,   # 30% pour les cartes communes (Common)
-                "U": 50,   # 25% pour les cartes peu communes (Uncommon)
-                "R": 50,   # 20% pour les cartes rares (Rare)
-                "E": 0,   # 15% pour les cartes épiques (Epic)
-                "L": 0    # 10% pour les cartes légendaires (Legendary)
+                "C": 30,   # 30% pour les cartes communes (Common)
+                "U": 25,   # 25% pour les cartes peu communes (Uncommon)
+                "R": 20,   # 20% pour les cartes rares (Rare)
+                "E": 15,   # 15% pour les cartes épiques (Epic)
+                "L": 10    # 10% pour les cartes légendaires (Legendary)
             }
 
             # Calculer le pourcentage total de drop (100%)
@@ -169,6 +169,10 @@ class Daily(commands.Cog):
                 rarity_emojis = {
                     "U": "<:Marigold:1220794525094772806>",
                     "R": "<:Sakura:1220794502944657460>"
+                }
+            elif event and event.lower() == "april fool's day":
+                rarity_emojis = {
+                    "L": "<:JOKE:1224024439004332142>"
                 }
             else:
                 rarity_emojis = {
