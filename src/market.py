@@ -53,6 +53,11 @@ class MarketPlace(commands.Cog):
                                     "U": "<:Flowers:1207807685215391775>",
                                     "E": "<:Arc:1207807149531729971>"
                                 }
+                            elif line[6] and line[6].lower() == "summer 2024":
+                                rarity_emojis = {
+                                    "U": "<:Wave:1256760316612710400>",
+                                    "E": "<:Coconut:1256760318869110856>"
+                                }
                             else:
                                 rarity_emojis = {
                                     "C": "<:C_:1107771999490686987>",
@@ -125,6 +130,11 @@ class MarketPlace(commands.Cog):
                             elif line[6] and line[6].lower() == "april fool's day":
                                 rarity_emojis = {
                                     "L": "<:JOKE:1224024439004332142>"
+                                }
+                            elif line[6] and line[6].lower() == "summer 2024":
+                                rarity_emojis = {
+                                    "U": "<:Wave:1256760316612710400>",
+                                    "E": "<:Coconut:1256760318869110856>"
                                 }
                             else:
                                 rarity_emojis = {

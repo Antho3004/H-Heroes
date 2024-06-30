@@ -129,6 +129,11 @@ class Shop(commands.Cog):
                 rarity_emojis = {
                     "L": "<:JOKE:1224024439004332142>"
                 }
+            elif event.lower() == "summer 2024":
+                rarity_emojis = {
+                    "U": "<:Wave:1256760316612710400>",
+                    "E": "<:Coconut:1256760318869110856>"
+                }
             elif event_lower == 'k-drama':
                 rarity_emojis = {
                     "C": "<:C_:1107771999490686987>",

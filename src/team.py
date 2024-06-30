@@ -263,6 +263,11 @@ class Team(commands.Cog):
             return {
                 "L": "<:JOKE:1224024439004332142>"
             }.get(rarity, "")
+        elif event.lower() == "summer 2024":
+            return {
+                "U": "<:Wave:1256760316612710400>",
+                "E": "<:Coconut:1256760318869110856>"
+            }.get(rarity, "")
         else:
             return {
                 "C": "<:C_:1107771999490686987>",

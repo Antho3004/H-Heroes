@@ -39,6 +39,11 @@ class Lock(commands.Cog):
             issue_number = arg.split("=")[1]  # Extraire le numéro de l'issue
             cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND SUBSTR(code_card, INSTR(code_card, '-') + 1) = ?", (user_id, issue_number))
             cards_to_lock = [row[0] for row in cursor.fetchall()]
+        elif arg.startswith("rarity="):
+            # Extraire l'event spécifié par l'utilisateur
+            event = arg.split("=")[1]
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(rarete) = ?", (user_id, event.lower()))
+            cards_to_lock = [row[0] for row in cursor.fetchall()]
         else:
             # Si l'argument ne commence ni par "group=", ni par "name=", ni par "issue=", supposons que ce sont des codes de carte
             cards_to_lock = arg.split()
@@ -101,6 +106,11 @@ class Lock(commands.Cog):
             # Extraire l'event spécifié par l'utilisateur
             event = arg.split("=")[1]
             cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(event) = ?", (user_id, event.lower()))
+            cards_to_unlock = [row[0] for row in cursor.fetchall()]
+        elif arg.startswith("rarity="):
+            # Extraire l'event spécifié par l'utilisateur
+            event = arg.split("=")[1]
+            cursor.execute("SELECT code_card FROM user_inventaire WHERE user_id = ? AND LOWER(rarete) = ?", (user_id, event.lower()))
             cards_to_unlock = [row[0] for row in cursor.fetchall()]
         elif arg.startswith("issue="):  
             issue_number = arg.split("=")[1]  # Extraire le numéro de l'issue
@@ -186,6 +196,11 @@ class Lock(commands.Cog):
                         rarity_emojis = {
                             "U": "<:Marigold:1220794525094772806>",
                             "R": "<:Sakura:1220794502944657460>"
+                    }
+                    elif line[12] and line[12].lower() == "summer 2024":
+                        rarity_emojis = {
+                            "U": "<:Wave:1256760316612710400>",
+                            "E": "<:Coconut:1256760318869110856>"
                     }
                     else:
                         rarity_emojis = {
